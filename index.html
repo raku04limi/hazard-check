@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>物件ハザードチェック</title>
+<meta name="description" content="賃貸物件の住所から、洪水・内水・土砂・高潮・津波・地形・避難場所をまとめて確認">
+<meta name="theme-color" content="#1f5fa8">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ハザードチェック">
+<link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="top">
+  <h1>物件ハザードチェック</h1>
+</header>
+
+<main>
+  <!-- 物件チェック -->
+  <section id="view-check" class="view active">
+    <form id="checkForm" class="card">
+      <label class="fld">物件の住所
+        <input id="addr" type="text" inputmode="text" autocomplete="street-address" placeholder="例：名古屋市中川区富田町千音寺" required>
+      </label>
+      <div class="row2">
+        <label class="fld">部屋の階
+          <select id="floor"></select>
+        </label>
+        <label class="fld">メモ（物件名など・任意）
+          <input id="memo" type="text" placeholder="例：〇〇ハイツ 6.2万">
+        </label>
+      </div>
+      <div class="btns">
+        <button type="submit" class="primary">判定する</button>
+        <button type="button" id="pickOnMap" class="ghost">地図で場所を指定</button>
+      </div>
+    </form>
+    <div id="candidates"></div>
+    <div id="result"></div>
+  </section>
+
+  <!-- PDF マップ管理 -->
+  <section id="view-maps" class="view">
+    <div class="card">
+      <h2>自治体のハザードマップ（PDF）</h2>
+      <p class="muted">市区町村のハザードマップPDF（または画像）を登録すると、国のデータに加えてPDFの地図でも判定します。登録したデータはこの端末の中だけに保存されます。</p>
+      <label class="filebtn primary">＋ PDF・画像を追加
+        <input id="addFile" type="file" accept="application/pdf,image/*" hidden>
+      </label>
+    </div>
+    <div id="mapList"></div>
+    <div class="card">
+      <h3>バックアップ</h3>
+      <p class="muted">登録したPDFマップと設定をファイルに書き出し、機種変更やデータ消失に備えます。</p>
+      <div class="btns">
+        <button type="button" id="exportBtn" class="ghost">書き出す</button>
+        <label class="filebtn ghost">読み込む<input id="importFile" type="file" accept="application/json,.json" hidden></label>
+      </div>
+    </div>
+  </section>
+
+  <!-- 履歴 -->
+  <section id="view-history" class="view">
+    <div id="historyList"></div>
+  </section>
+
+  <!-- 使い方 -->
+  <section id="view-help" class="view">
+    <div class="card prose">
+      <h2>使い方</h2>
+      <ol>
+        <li><b>物件チェック</b>：住所と部屋の階を入れて「判定する」。国土交通省「重ねるハザードマップ」のデータと、登録したPDFマップの両方で項目ごとに評価します。</li>
+        <li><b>PDFマップ</b>（任意）：自治体のハザードマップPDFを登録します。
+          <ol>
+            <li>「凡例」で、地図の凡例の色見本をタップし、意味（例：0.5〜3m）と危険度を登録</li>
+            <li>「位置合わせ」で、PDF上の目印（交差点・駅・橋など）をタップ → 下の地図で同じ場所をタップ。これを<b>3か所以上</b>（地図の端どうしなど、離れた場所がおすすめ）</li>
+            <li>「確認モード」で地図をタップし、PDF上の十字がちゃんと同じ場所に来るか確認</li>
+          </ol>
+        </li>
+        <li>ホーム画面に追加すると、アプリのように使え、保存データも消えにくくなります（Safari：共有 →「ホーム画面に追加」）。</li>
+      </ol>
+      <h2>危険度の目安</h2>
+      <ul class="lvlist">
+        <li><span class="badge lv0">なし</span> 想定区域外</li>
+        <li><span class="badge lv1">低</span> 浸水0.5m未満など（床下程度）</li>
+        <li><span class="badge lv2">注意</span> 浸水0.5〜1m、浸水継続区域、避難場所が遠い など</li>
+        <li><span class="badge lv3">高</span> 浸水0.5〜3m（1階は床上浸水）、土砂災害警戒区域、旧河道・埋立地 など</li>
+        <li><span class="badge lv4">危険</span> 浸水3m以上、土砂災害特別警戒区域、家屋倒壊等氾濫想定区域</li>
+      </ul>
+      <p>2階以上の部屋は、想定浸水深が部屋の床より低ければ危険度を「注意」までに下げます（建物の孤立・停電の恐れは残ります）。</p>
+      <h2>ご注意</h2>
+      <p class="muted">この判定は目安です。色の読み取りや住所の位置ずれで誤ることがあります。契約前には必ず各自治体の最新のハザードマップや、重要事項説明（水害ハザードマップの説明は宅建業者の義務）で確認してください。</p>
+      <h2>出典</h2>
+      <p class="muted">ハザードマップポータルサイト（国土交通省）のオープンデータ、国土地理院（地理院タイル、住所検索、標高、地形分類、指定緊急避難場所）を利用しています。</p>
+      <p class="muted" id="ver"></p>
+    </div>
+  </section>
+</main>
+
+<nav class="tabs">
+  <button data-view="check" class="active"><span>🏠</span>物件チェック</button>
+  <button data-view="maps"><span>📄</span>PDFマップ</button>
+  <button data-view="history"><span>🕘</span>履歴</button>
+  <button data-view="help"><span>❔</span>使い方</button>
+</nav>
+
+<!-- ページ選択 -->
+<div id="pageDlg" class="overlay" hidden>
+  <div class="sheet">
+    <div class="sheet-head"><b>取り込むページを選択</b><button type="button" class="x" data-close>✕</button></div>
+    <p class="muted">地図が載っているページを選んでください（1ページずつ登録します）。</p>
+    <div id="pageGrid" class="pagegrid"></div>
+  </div>
+</div>
+
+<!-- マップ編集 -->
+<div id="editor" class="overlay full" hidden>
+  <div class="ed-head">
+    <button type="button" class="back" id="edClose">‹ 戻る</button>
+    <b id="edTitle"></b>
+  </div>
+  <div class="seg" id="edSeg">
+    <button data-pane="basic" class="active">基本</button>
+    <button data-pane="legend">凡例</button>
+    <button data-pane="geo">位置合わせ</button>
+  </div>
+  <div class="ed-pane active" data-pane="basic">
+    <div class="pad">
+      <label class="fld">名前<input id="edName" type="text"></label>
+      <label class="fld">種類<select id="edCat"></select></label>
+      <label class="fld">メモ（出典URLなど）<input id="edNote" type="text"></label>
+      <label class="fld">色の許容差 <span id="edTolV"></span>
+        <input id="edTol" type="range" min="15" max="80" step="1">
+        <small class="muted">凡例と色が一致しないときは大きく、隣の色と混同するときは小さく</small>
+      </label>
+      <div id="edStatus" class="status"></div>
+      <button type="button" id="edDelete" class="danger">このマップを削除</button>
+    </div>
+  </div>
+  <div class="ed-pane" data-pane="legend">
+    <div id="legViewer" class="viewer"></div>
+    <div class="ed-bottom">
+      <div id="legHint" class="hint">凡例の色見本（例：0.5〜3m の色）をタップしてください。拡大は２本指で。</div>
+      <div id="legForm" hidden>
+        <div class="legrow"><span id="legSwatch" class="swatch big"></span>
+          <input id="legLabel" type="text" placeholder="意味（例：0.5〜3m）">
+          <select id="legLevel"></select>
+        </div>
+        <div id="legTpl" class="chips"></div>
+        <div class="btns"><button type="button" id="legAdd" class="primary">凡例に追加</button><button type="button" id="legCancel" class="ghost">やめる</button></div>
+      </div>
+      <div id="legList"></div>
+    </div>
+  </div>
+  <div class="ed-pane" data-pane="geo">
+    <div id="geoViewer" class="viewer half"></div>
+    <div class="geo-bar">
+      <div id="geoHint" class="hint"></div>
+      <div class="geo-tools">
+        <form id="geoSearch"><input type="search" placeholder="地図を住所で移動"></form>
+        <button type="button" id="geoCheck" class="ghost sm">確認モード</button>
+        <button type="button" id="geoBase" class="ghost sm">写真</button>
+        <button type="button" id="geoListBtn" class="ghost sm">点一覧</button>
+      </div>
+      <div id="geoList" hidden></div>
+    </div>
+    <div id="geoMap" class="mapbox half"></div>
+  </div>
+</div>
+
+<!-- 地図表示・地点指定 -->
+<div id="mapView" class="overlay full" hidden>
+  <div class="ed-head">
+    <button type="button" class="back" id="mvClose">‹ 戻る</button>
+    <select id="mvLayer"></select>
+  </div>
+  <div id="mvHint" class="hint" hidden></div>
+  <div id="mvMap" class="mapbox fill"></div>
+  <div id="mvPickBar" class="pickbar" hidden><button type="button" id="mvPickOk" class="primary">この場所で判定</button></div>
+</div>
+
+<div id="toast" class="toast" hidden></div>
+
+<script src="vendor/leaflet/leaflet.js"></script>
+<script src="vendor/pdfjs/pdf.min.js"></script>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "name": "物件ハザードチェック",
+  "short_name": "ハザードチェック",
+  "description": "物件の住所から、洪水・内水・土砂・高潮・津波・地形・避難場所をまとめて確認",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f3f5f8",
+  "theme_color": "#1f5fa8",
+  "lang": "ja",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
