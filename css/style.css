@@ -148,7 +148,7 @@ button:disabled { opacity: .5; }
 .ed-head b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ed-head select { margin: 0; flex: 1; padding: 6px 8px; font-size: 14px; }
 .back { background: transparent; border: 0; color: inherit; padding: 6px 8px; font-weight: 700; flex: none; }
-.seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; background: var(--card); border-bottom: 1px solid var(--line); }
+.seg { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; background: var(--card); border-bottom: 1px solid var(--line); }
 .seg button { border: 0; border-radius: 0; background: none; color: var(--muted); padding: 10px 0; }
 .seg button.active { color: var(--accent); font-weight: 700; box-shadow: inset 0 -3px 0 var(--accent); }
 .ed-pane { display: none; flex: 1; min-height: 0; flex-direction: column; }
@@ -184,3 +184,11 @@ button:disabled { opacity: .5; }
 .pickbar button { width: 100%; }
 .toast { position: fixed; left: 50%; bottom: calc(var(--tabh) + env(safe-area-inset-bottom) + 16px); transform: translateX(-50%); background: #222; color: #fff; padding: 10px 16px; border-radius: 10px; z-index: 300; font-size: 14px; max-width: 90vw; pointer-events: none; opacity: .92; }
 .leaflet-container { background: #ddd; }
+
+.autobox { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--line); }
+.mapitem.child { margin-left: 22px; }
+.mapitem.child img { width: 48px; height: 48px; }
+.importlog { font-size: 13px; }
+.importlog div { padding: 2px 0; }
+.progress { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; margin: 6px 0; }
+.progress > i { display: block; height: 100%; background: var(--accent); width: 0; transition: width .2s; }

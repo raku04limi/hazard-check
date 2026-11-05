@@ -10,6 +10,8 @@ export const CATEGORIES = [
   { key: 'dosha', name: '土砂災害', icon: '⛰️' },
   { key: 'takashio', name: '高潮', icon: '🌀' },
   { key: 'tsunami', name: '津波', icon: '🌊' },
+  { key: 'tameike', name: 'ため池', icon: '💧', pdfOnly: true },
+  { key: 'jishin', name: '地震（震度・液状化）', icon: '🫨', pdfOnly: true },
   { key: 'chikei', name: '地形・標高', icon: '🗺️' },
   { key: 'hinan', name: '避難場所', icon: '🏫' },
 ];

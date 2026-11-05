@@ -61,18 +61,30 @@ function solve3(m, b) {
  * 地図 → 画像 のアフィン変換を最小二乗で求める。
  */
 export function fitAffine(points) {
-  if (!points || points.length < 3) return null;
+  if (!points || points.length < 2) return null;
   const w = points.map((p) => lonLatToPixel(p.lon, p.lat, GEO_Z));
   const ox = w.reduce((s, p) => s + p.x, 0) / w.length;
   const oy = w.reduce((s, p) => s + p.y, 0) / w.length;
-  const X = w.map((p) => [p.x - ox, p.y - oy, 1]);
-  const ata = [0, 1, 2].map((i) => [0, 1, 2].map((j) => X.reduce((s, r) => s + r[i] * r[j], 0)));
-  const atu = [0, 1, 2].map((i) => X.reduce((s, r, k) => s + r[i] * points[k].px, 0));
-  const atv = [0, 1, 2].map((i) => X.reduce((s, r, k) => s + r[i] * points[k].py, 0));
-  const pu = solve3(ata, atu);
-  const pv = solve3(ata, atv);
-  if (!pu || !pv) return null;
-  const T = { a: pu[0], b: pu[1], c: pu[2], d: pv[0], e: pv[1], f: pv[2], ox, oy };
+  let T;
+  if (points.length === 2) {
+    // 2点：相似変換（拡大縮小・回転・平行移動）
+    const [p0, p1] = points;
+    const X0 = w[0].x - ox, Y0 = w[0].y - oy, X1 = w[1].x - ox, Y1 = w[1].y - oy;
+    const dX = X1 - X0, dY = Y1 - Y0, du = p1.px - p0.px, dv = p1.py - p0.py;
+    const den = dX * dX + dY * dY;
+    if (den < 1e-9) return null;
+    const a = (du * dX + dv * dY) / den, b = (dv * dX - du * dY) / den; // u = a X - b Y + c, v = b X + a Y + f
+    T = { a, b: -b, c: p0.px - (a * X0 - b * Y0), d: b, e: a, f: p0.py - (b * X0 + a * Y0), ox, oy };
+  } else {
+    const X = w.map((p) => [p.x - ox, p.y - oy, 1]);
+    const ata = [0, 1, 2].map((i) => [0, 1, 2].map((j) => X.reduce((s, r) => s + r[i] * r[j], 0)));
+    const atu = [0, 1, 2].map((i) => X.reduce((s, r, k) => s + r[i] * points[k].px, 0));
+    const atv = [0, 1, 2].map((i) => X.reduce((s, r, k) => s + r[i] * points[k].py, 0));
+    const pu = solve3(ata, atu);
+    const pv = solve3(ata, atv);
+    if (!pu || !pv) return null;
+    T = { a: pu[0], b: pu[1], c: pu[2], d: pv[0], e: pv[1], f: pv[2], ox, oy };
+  }
   const det = T.a * T.e - T.b * T.d;
   if (Math.abs(det) < 1e-12) return null;
   T.det = det;

@@ -1,8 +1,8 @@
 // オフラインでもアプリ本体を開けるようにするキャッシュ（地図データはキャッシュしない）
-const CACHE = 'hazard-check-v1.0.0';
+const CACHE = 'hazard-check-v1.1.0';
 const SHELL = [
   './', 'index.html', 'css/style.css', 'manifest.webmanifest',
-  'js/app.js', 'js/hazard.js', 'js/geo.js', 'js/db.js', 'js/viewer.js', 'js/pdfmaps.js',
+  'js/app.js', 'js/register.js', 'js/hazard.js', 'js/geo.js', 'js/db.js', 'js/viewer.js', 'js/pdfmaps.js',
   'vendor/leaflet/leaflet.js', 'vendor/leaflet/leaflet.css',
   'vendor/pdfjs/pdf.min.js', 'vendor/pdfjs/pdf.worker.min.js',
   'icons/icon.svg', 'icons/icon-192.png',

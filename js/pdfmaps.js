@@ -7,6 +7,8 @@ export const MAP_CATEGORIES = [
   { key: 'dosha', name: '土砂災害' },
   { key: 'takashio', name: '高潮' },
   { key: 'tsunami', name: '津波' },
+  { key: 'tameike', name: 'ため池' },
+  { key: 'jishin', name: '地震（震度・液状化）' },
   { key: 'chikei', name: '地形・標高' },
   { key: 'hinan', name: '避難場所（目視用）' },
   { key: 'other', name: 'その他（目視用）' },
@@ -14,14 +16,18 @@ export const MAP_CATEGORIES = [
 
 export const LEGEND_TEMPLATES = {
   depth: [
-    ['0.5m未満', 1], ['0.5〜1m', 2], ['0.5〜3m', 3], ['1〜2m', 3], ['2〜5m', 4], ['3〜5m', 4], ['5m以上', 4], ['10m以上', 4],
-    ['0.1〜0.2m', 1], ['0.2〜0.5m', 1], ['0.3m未満', 1],
+    ['0.3m未満', 1], ['0.3〜0.5m', 1], ['0.5m未満', 1], ['0.5〜1m', 2], ['0.5〜3m', 3], ['1〜3m', 3], ['3〜5m', 4], ['5〜10m', 4], ['10m以上', 4],
+    ['1〜2m', 3], ['2〜5m', 4], ['5m以上', 4],
   ],
+  duration: [['12時間未満', 2], ['12時間〜1日', 2], ['1日〜3日', 3], ['3日〜1週間', 4], ['1週間以上', 4]],
   dosha: [['土砂災害警戒区域', 3], ['土砂災害特別警戒区域', 4], ['土石流危険渓流', 3], ['急傾斜地崩壊危険箇所', 3]],
+  jishin: [['震度7', 4], ['震度6強', 4], ['震度6弱', 3], ['震度5強', 2], ['震度5弱', 1], ['液状化 可能性大', 3], ['液状化 可能性中', 2], ['液状化 可能性小', 1], ['液状化 可能性なし', 0]],
   chikei: [['旧河道', 3], ['後背低地', 3], ['盛土地・埋立地', 3], ['自然堤防', 2], ['台地・段丘', 0], ['海抜0m以下', 3]],
 };
+export const DEPTH_CATS = ['flood', 'naisui', 'takashio', 'tsunami', 'tameike'];
+export const catGroup = (cat) => (DEPTH_CATS.includes(cat) ? 'depth' : cat);
 export function templatesFor(cat) {
-  if (['flood', 'naisui', 'takashio', 'tsunami'].includes(cat)) return LEGEND_TEMPLATES.depth;
+  if (DEPTH_CATS.includes(cat)) return [...LEGEND_TEMPLATES.depth, ...LEGEND_TEMPLATES.duration];
   return LEGEND_TEMPLATES[cat] || [];
 }
 export const isVisualOnly = (cat) => cat === 'hinan' || cat === 'other';
@@ -60,7 +66,7 @@ export async function renderPage(pdf, pageNo, maxSide = 5000, maxPixels = 16e6) 
   ctx.fillStyle = '#fff';
   ctx.fillRect(0, 0, cv.width, cv.height);
   await page.render({ canvasContext: ctx, viewport: vp }).promise;
-  const blob = await new Promise((r) => cv.toBlob(r, 'image/png'));
+  const blob = await new Promise((r) => cv.toBlob(r, 'image/jpeg', 0.9));
   const out = { blob, width: cv.width, height: cv.height };
   cv.width = cv.height = 0;
   return out;
@@ -83,11 +89,11 @@ export async function loadImageFile(file) {
   const bmp = await createImageBitmap(file);
   let { width, height } = bmp;
   const k = Math.min(1, Math.sqrt(16e6 / (width * height)));
-  if (k >= 1 && file.type === 'image/png') return { blob: file, width, height };
+  if (k >= 1 && /jpe?g/.test(file.type)) return { blob: file, width, height };
   const cv = document.createElement('canvas');
   cv.width = Math.floor(width * k); cv.height = Math.floor(height * k);
   cv.getContext('2d').drawImage(bmp, 0, 0, cv.width, cv.height);
-  const blob = await new Promise((r) => cv.toBlob(r, 'image/png'));
+  const blob = await new Promise((r) => cv.toBlob(r, 'image/jpeg', 0.9));
   const out = { blob, width: cv.width, height: cv.height };
   cv.width = cv.height = 0;
   return out;
@@ -95,13 +101,38 @@ export async function loadImageFile(file) {
 
 // 画像ビットマップのキャッシュ
 const bmpCache = new Map();
+let blobLoader = async (id) => null;
+export function setBlobLoader(fn) { blobLoader = fn; }
+export const imageIdOf = (rec) => rec.imageId || rec.id;
 export async function getBitmap(rec) {
-  const key = rec.id + ':' + (rec.updatedImage || 0);
-  if (!bmpCache.has(key)) bmpCache.set(key, createImageBitmap(rec.blob));
+  const key = imageIdOf(rec);
+  if (!bmpCache.has(key)) {
+    const p = (async () => createImageBitmap(rec.blob || (await blobLoader(key))))();
+    bmpCache.set(key, p);
+    p.catch(() => bmpCache.delete(key));
+  }
   return bmpCache.get(key);
 }
-export function dropBitmap(id) {
-  for (const k of [...bmpCache.keys()]) if (k.startsWith(id + ':')) bmpCache.delete(k);
+export function dropBitmap(id) { bmpCache.delete(id); }
+
+export function pointInPoly(x, y, poly) {
+  let inside = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const [xi, yi] = poly[i], [xj, yj] = poly[j];
+    if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) inside = !inside;
+  }
+  return inside;
+}
+/** 地図枠の有効範囲内か（範囲ポリゴン＋自動判定の除外マス） */
+export function inFrame(rec, x, y) {
+  if (x < 0 || y < 0 || x >= rec.width || y >= rec.height) return false;
+  if (rec.area && rec.area.length >= 3 && !pointInPoly(x, y, rec.area)) return false;
+  const m = rec.validMask;
+  if (m) {
+    const c = Math.floor((x - m.x0) / m.cell), r = Math.floor((y - m.y0) / m.cell);
+    if (c >= 0 && r >= 0 && c < m.cols && r < m.rows && !m.bits[r * m.cols + c]) return false;
+  }
+  return true;
 }
 
 /** 画像の一部分の画素を取得 */
@@ -154,7 +185,7 @@ export async function evalMap(rec, lat, lon, nearM = 50) {
   const T = transformOf(rec);
   if (!T) return { covered: false, reason: '位置合わせ未完了' };
   const p = mapToImage(T, lat, lon);
-  if (p.x < 0 || p.y < 0 || p.x >= rec.width || p.y >= rec.height) return { covered: false, reason: '範囲外', T };
+  if (!inFrame(rec, p.x, p.y)) return { covered: false, reason: '範囲外', T };
   const res = { covered: true, x: p.x, y: p.y, T };
   if (isVisualOnly(rec.category) || !(rec.legend && rec.legend.length)) return res;
   const bmp = await getBitmap(rec);

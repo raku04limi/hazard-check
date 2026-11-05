@@ -33,6 +33,8 @@ export class ImageViewer {
 
   setMarkers(m) { this.markers = m || []; this.draw(); }
 
+  setPolys(p) { this.polys = p || []; this.draw(); }
+
   fit() {
     if (!this.img || !this.w) return;
     this.s = Math.min(this.w / this.img.width, this.h / this.img.height);
@@ -83,6 +85,21 @@ export class ImageViewer {
     c.imageSmoothingEnabled = this.s < 2;
     c.drawImage(this.img, 0, 0);
     c.setTransform(dpr, 0, 0, dpr, 0, 0);
+    for (const P of this.polys || []) {
+      if (P.rects) {
+        c.fillStyle = P.fill || 'rgba(255,0,0,.35)';
+        for (const [x, y, w, h] of P.rects) c.fillRect(x * this.s + this.ox, y * this.s + this.oy, w * this.s, h * this.s);
+        continue;
+      }
+      if (!P.pts || !P.pts.length) continue;
+      c.beginPath();
+      P.pts.forEach(([x, y], i) => { const X = x * this.s + this.ox, Y = y * this.s + this.oy; i ? c.lineTo(X, Y) : c.moveTo(X, Y); });
+      if (P.closed !== false) c.closePath();
+      if (P.fill) { c.fillStyle = P.fill; c.fill(); }
+      c.lineWidth = 4; c.strokeStyle = '#fff'; c.stroke();
+      c.lineWidth = 2; c.strokeStyle = P.color || '#1f5fa8'; c.stroke();
+      if (P.dots) for (const [x, y] of P.pts) { c.beginPath(); c.arc(x * this.s + this.ox, y * this.s + this.oy, 5, 0, 7); c.fillStyle = P.color || '#1f5fa8'; c.fill(); }
+    }
     for (const m of this.markers) {
       const x = m.x * this.s + this.ox, y = m.y * this.s + this.oy;
       c.lineWidth = 3;
