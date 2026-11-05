@@ -6,10 +6,10 @@ import {
   getBitmap, dropBitmap, pickColor, rgbHex, evalMap, snippet, transformOf, parseDepth,
   setBlobLoader, imageIdOf, catGroup,
 } from './pdfmaps.js';
-import { findMatches, computeValidMask, inscribedRect } from './register.js';
+import { findMatches, findMatchesTiled, computeValidMask, inscribedRect } from './register.js';
 import { mapToImage } from './geo.js';
 
-const VERSION = '1.1.0';
+const VERSION = '1.2.0';
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -417,7 +417,8 @@ function guessCategory(name) {
 const CAT_JA = { flood: '洪水', naisui: '内水氾濫', takashio: '高潮', tsunami: '津波', tameike: 'ため池', jishin: '地震', hinan: '避難所', dosha: '土砂災害', chikei: '地形' };
 function niceName(base, cat) {
   // 名古屋市の「a1hm-kozui14midori」のようなファイル名を読みやすくする
-  if (/^[\x00-\x7f]+$/.test(base) && CAT_JA[cat]) return `${CAT_JA[cat]}（${base}）`;
+  const m = base.match(/^([\x00-\x7f]+)(（p\.\d+）)?$/);
+  if (m && CAT_JA[cat]) return `${CAT_JA[cat]}（${m[1]}）${m[2] ? m[2].replace(/[（）]/g, ' ').trim() : ''}`;
   return base;
 }
 
@@ -458,6 +459,11 @@ function choosePage(pdf) {
       grid.appendChild(b);
       renderThumb(pdf, i, 200).then((cv) => b.prepend(cv)).catch(() => {});
     }
+    const all = document.createElement('button');
+    all.type = 'button'; all.className = 'primary';
+    all.textContent = `全${pdf.numPages}ページを取り込む`;
+    all.addEventListener('click', () => { $('#pageDlg').hidden = true; resolve('all'); });
+    grid.prepend(all);
     $('[data-close]').onclick = () => { $('#pageDlg').hidden = true; resolve(null); };
   });
 }
@@ -476,20 +482,26 @@ $('#addFile').addEventListener('change', async (e) => {
     const base = file.name.replace(/\.(pdf|png|jpe?g|webp|gif)$/i, '');
     const ln = log.line(`${file.name}：読み込み中…`);
     try {
-      let img;
+      const imgs = [];
       if (file.type === 'application/pdf' || /\.pdf$/i.test(file.name)) {
         const pdf = await openPdf(file);
-        const pageNo = pdf.numPages === 1 ? 1 : await choosePage(pdf);
-        if (!pageNo) { ln.textContent = `${file.name}：取り込みをやめました`; continue; }
-        ln.textContent = `${file.name}：画像化しています…`;
-        img = await renderPage(pdf, pageNo);
-        if (pdf.numPages > 1) img.page = pageNo;
-      } else img = await loadImageFile(file);
-      const rec = await addMapRecord(img, img.page ? `${base}（p.${img.page}）` : base);
-      lastId = rec.id; nNew++;
-      ln.textContent = `${rec.name}：取り込みました`;
-      const n = await autoAlignRoot(rec, log, (f) => log.progress((fi + 0.3 + 0.7 * f) / files.length));
-      if (n) nAuto++;
+        const sel = pdf.numPages === 1 ? 1 : await choosePage(pdf);
+        if (!sel) { ln.textContent = `${file.name}：取り込みをやめました`; continue; }
+        const pages = sel === 'all' ? Array.from({ length: Math.min(pdf.numPages, 20) }, (_, i) => i + 1) : [sel];
+        for (const pg of pages) {
+          ln.textContent = `${file.name}：画像化しています…${pages.length > 1 ? `（${pg}/${pages.length}ページ）` : ''}`;
+          const img = await renderPage(pdf, pg);
+          if (pdf.numPages > 1) img.page = pg;
+          imgs.push(img);
+        }
+      } else imgs.push(await loadImageFile(file));
+      ln.textContent = `${file.name}：取り込みました`;
+      for (const img of imgs) {
+        const rec = await addMapRecord(img, img.page ? `${base}（p.${img.page}）` : base);
+        lastId = rec.id; nNew++;
+        const n = await autoAlignRoot(rec, log, (f) => log.progress((fi + 0.3 + 0.7 * f) / files.length));
+        if (n) nAuto++;
+      }
     } catch (err) {
       console.error(err);
       ln.textContent = `${file.name}：失敗しました（${err.message || err}）`;
@@ -594,13 +606,18 @@ async function searchWithFrames(frames, tgtBmp, opts = {}, onProgress) {
     const ref = frames[i];
     const refBmp = await getBitmap(ref);
     const box = templateRect(ref);
-    const ms = await findMatches(refBmp, box, ref.area, tgtBmp, { ...opts, onProgress: (f) => onProgress && onProgress((i + f) / frames.length) });
+    const prog = (f) => onProgress && onProgress((i + f) / frames.length);
+    let ms = await findMatches(refBmp, box, ref.area, tgtBmp, { ...opts, onProgress: prog });
+    if (!ms.length && opts.tiles) {
+      // 一部しか写っていないページ用（縮尺違い・複数区の合同マップなど）
+      ms = await findMatchesTiled(refBmp, box, ref.area, tgtBmp, { onProgress: prog, levels: opts.tileLevels || 3 });
+    }
     for (const m of ms) {
       // 背景地図がマスごとに一致するかで検証（たまたま似ていただけの一致を除く）
       const mask = computeValidMask(refBmp, box, tgtBmp, m);
       const frac = mask.bits.reduce((a, b) => a + b, 0) / mask.bits.length;
       if (window.__debugMatch) window.__debugMatch.push([ref.name, ref.frameLabel, +m.s.toFixed(3), +m.score.toFixed(3), +frac.toFixed(2)]);
-      if (frac < MIN_VALID_FRAC) continue;
+      if (!m.partial && frac < MIN_VALID_FRAC) continue;
       items.push({ ref, refBmp, box, m, mask });
     }
   }
@@ -628,9 +645,10 @@ async function autoAlignRoot(root, log, onProgress) {
   const ln = log && log.line(`${root.name}：自動で位置合わせ中…`);
   for (let i = 0; i < groups.length; i++) {
     // まず一番大きい地図枠で当たりを付け、見つかったら同じページの他の地図枠でも探す
-    const first = await searchWithFrames([groups[i][0]], tgtBmp, {}, (f) => onProgress && onProgress((i + f * 0.5) / groups.length));
+    // 部分一致（タイル）探索は時間がかかるので、最有力の参照ページだけで行う
+    const first = await searchWithFrames([groups[i][0]], tgtBmp, { tiles: i === 0 }, (f) => onProgress && onProgress((i + f * 0.5) / groups.length));
     if (!first.length) continue;
-    const rest = groups[i].length > 1 ? await searchWithFrames(groups[i].slice(1), tgtBmp, {}, (f) => onProgress && onProgress((i + 0.5 + f * 0.5) / groups.length)) : [];
+    const rest = groups[i].length > 1 ? await searchWithFrames(groups[i].slice(1), tgtBmp, { tiles: first.some((it) => it.m.partial), tileLevels: 2 }, (f) => onProgress && onProgress((i + 0.5 + f * 0.5) / groups.length)) : [];
     const items = dedupeItems([...first, ...rest]);
     const saved = await applyMatches(root, items, tgtBmp);
     if (ln) { ln.textContent = `${root.name}：自動で位置合わせしました（地図${saved.length}枚、一致度 ${Math.round(Math.max(...items.map((it) => it.m.score)) * 100)}%）`; ln.className = 'ok'; }

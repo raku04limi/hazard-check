@@ -164,6 +164,14 @@ function zeroRect(F, x0, y0, x1, y1) {
   for (let y = c; y < d; y++) F.data.fill(0, y * F.w + a, y * F.w + b);
 }
 const cloneF = (F) => ({ ...F, data: new Float32Array(F.data) });
+
+/** 拡大して使うときは、参照側をその分だけ細かい解像度で特徴量化する（ぼやけ防止） */
+function refFeatFor(refBmp, base, s, tgtK) {
+  const want = refBmp.width * s * tgtK;
+  if (want <= base * 1.15) return featureMap(refBmp, base);
+  const n = Math.ceil(Math.log(want / base) / Math.log(1.3));
+  return featureMap(refBmp, Math.min(4096, Math.round(base * Math.pow(1.3, n))));
+}
 const tick = () => new Promise((r) => setTimeout(r, 0));
 
 function pip(x, y, poly) {
@@ -205,7 +213,8 @@ export async function findMatches(refBmp, box, poly, tgtBmp, opts = {}) {
     if (sameImage && Math.abs(s - 1) < 0.08) continue;
     // 見つける地図がページの1/4未満の大きさになる拡大率は使わない（小さすぎると偶然の一致が増える）
     if (s * (bx1 - bx0) < minFrac * tgtBmp.width && s * (by1 - by0) < minFrac * tgtBmp.height) continue;
-    const t = cropResize(rc, bx0 * rc.k, by0 * rc.k, (bx1 - bx0) * rc.k, (by1 - by0) * rc.k, (s * tc.k) / rc.k, tmask);
+    const R = refFeatFor(refBmp, coarseW, s, tc.k);
+    const t = cropResize(R, bx0 * R.k, by0 * R.k, (bx1 - bx0) * R.k, (by1 - by0) * R.k, (s * tc.k) / R.k, tmask);
     if (t.tw < 40 || t.th < 40) continue;
     const ps = ncc(t.T, t.tw, t.th, tgC, 4) || [];
     for (const p of ps) if (p.score >= threshold * 0.8) cands.push({ ...p, s, w: t.tw, h: t.th });
@@ -237,9 +246,10 @@ export async function findMatches(refBmp, box, poly, tgtBmp, opts = {}) {
     const tg = prepTarget(win);
     let fine = null;
     const tryScale = async (s) => {
-      const t = cropResize(rf, bx0 * rf.k, by0 * rf.k, (bx1 - bx0) * rf.k, (by1 - by0) * rf.k, (s * tf.k) / rf.k, tmask);
+      const R = refFeatFor(refBmp, fineW, s, tf.k);
+      const t = cropResize(R, bx0 * R.k, by0 * R.k, (bx1 - bx0) * R.k, (by1 - by0) * R.k, (s * tf.k) / R.k, tmask);
       const r = ncc(t.T, t.tw, t.th, tg);
-      if (r && (!fine || r.score > fine.score)) fine = { ...r, s, t };
+      if (r && (!fine || r.score > fine.score)) fine = { ...r, s, t, rk: R.k };
       await tick();
     };
     for (let i = -3; i <= 3; i++) await tryScale(c.s * Math.pow(1.014, i));
@@ -247,10 +257,10 @@ export async function findMatches(refBmp, box, poly, tgtBmp, opts = {}) {
     for (const i of [-3, -2, -1, 1, 2, 3]) await tryScale(s1 * Math.pow(1.004, i));
     if (onProgress) onProgress(0.6 + (0.4 * (n + 1)) / picked.length);
     if (!fine || fine.score < threshold) continue;
-    const sx = fine.t.sx, sy = fine.t.sy;
-    const S = (((sx + sy) / 2) * rf.k) / tf.k;
-    const tx = (fine.x + wx0 - sx * bx0 * rf.k) / tf.k;
-    const ty = (fine.y + wy0 - sy * by0 * rf.k) / tf.k;
+    const sx = fine.t.sx, sy = fine.t.sy, rk = fine.rk;
+    const S = (((sx + sy) / 2) * rk) / tf.k;
+    const tx = (fine.x + wx0 - sx * bx0 * rk) / tf.k;
+    const ty = (fine.y + wy0 - sy * by0 * rk) / tf.k;
     results.push({ s: S, tx, ty, score: fine.score });
   }
   return results;
@@ -261,7 +271,8 @@ export async function findMatches(refBmp, box, poly, tgtBmp, opts = {}) {
  * 返り値: { x0, y0, cell, cols, rows, bits }（新画像px）
  */
 export function computeValidMask(refBmp, refBox, tgtBmp, m, W = 1024) {
-  const rf = featureMap(refBmp, W), tf = featureMap(tgtBmp, W);
+  const tf = featureMap(tgtBmp, W);
+  const rf = featureMap(refBmp, Math.min(4096, Math.max(W, Math.round(refBmp.width * m.s * tf.k))));
   const [bx0, by0, bx1, by1] = refBox;
   const X0 = Math.max(0, m.s * bx0 + m.tx), Y0 = Math.max(0, m.s * by0 + m.ty);
   const X1 = Math.min(tgtBmp.width, m.s * bx1 + m.tx), Y1 = Math.min(tgtBmp.height, m.s * by1 + m.ty);
@@ -349,4 +360,53 @@ export function inscribedRect(poly, W, H, validMask) {
   }
   if (!best.a) return [x0, y0, x1, y1];
   return [x0 + best.i0 * cw, y0 + best.j0 * ch, x0 + best.i1 * cw, y0 + best.j1 * ch];
+}
+
+/**
+ * 部分一致の探索：参照の範囲を小さなタイルに分けてそれぞれ探し、
+ * 複数のタイルが同じ変換（拡大率・位置）を示したものを採用する。
+ * 対象ページに参照の地図の一部しか写っていない（縮尺が大きい、別の区と合同）場合用。
+ */
+export async function findMatchesTiled(refBmp, box, poly, tgtBmp, opts = {}) {
+  const { onProgress, smin = 0.3, smax = 4, steps = 44, levels = 3 } = opts;
+  const [x0, y0, x1, y1] = box;
+  const w = x1 - x0, h = y1 - y0;
+  // 大きいタイルから順に試し、見つかった時点で終了
+  const LEVELS = [
+    { f: 0.55, pos: [[0, 0], [1, 0], [0, 1], [1, 1], [0.5, 0.5]] },
+    { f: 0.35, pos: [0, 0.5, 1].flatMap((i) => [0, 0.5, 1].map((j) => [i, j])) },
+    { f: 0.25, pos: [0, 1 / 3, 2 / 3, 1].flatMap((i) => [0, 1 / 3, 2 / 3, 1].map((j) => [i, j])) },
+  ].slice(0, levels);
+  const total = LEVELS.reduce((t, L) => t + L.pos.length, 0);
+  let done = 0;
+  const tol = 0.012 * Math.max(tgtBmp.width, tgtBmp.height);
+  const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+  const at = (m) => [m.s * cx + m.tx, m.s * cy + m.ty];
+  for (const L of LEVELS) {
+    const found = [];
+    for (let i = 0; i < L.pos.length; i++) {
+      const [px, py] = L.pos[i];
+      const tb = [x0 + px * (1 - L.f) * w, y0 + py * (1 - L.f) * h, x0 + (px * (1 - L.f) + L.f) * w, y0 + (py * (1 - L.f) + L.f) * h];
+      const ms = await findMatches(refBmp, tb, null, tgtBmp, {
+        smin, smax, steps, maxMatches: 2, minFrac: 0.12, threshold: 0.24,
+        onProgress: (p) => onProgress && onProgress((done + p) / total),
+      });
+      done++;
+      for (const m of ms) found.push({ ...m, tile: i });
+    }
+    // 変換が一致するタイルをまとめる
+    let best = null;
+    for (const a of found) {
+      const grp = found.filter((b) => Math.abs(b.s / a.s - 1) < 0.02 && Math.hypot(at(a)[0] - at(b)[0], at(a)[1] - at(b)[1]) < tol);
+      const tilesHit = new Set(grp.map((g) => g.tile)).size;
+      const score = grp.reduce((t, g) => t + g.score, 0);
+      if (tilesHit >= 2 && Math.max(...grp.map((g) => g.score)) >= 0.3 && (!best || score > best.score)) best = { grp, score, tilesHit };
+    }
+    if (best) {
+      const W = best.grp.reduce((t, g) => t + g.score, 0);
+      const avg = (k) => best.grp.reduce((t, g) => t + g[k] * g.score, 0) / W;
+      return [{ s: avg('s'), tx: avg('tx'), ty: avg('ty'), score: Math.max(...best.grp.map((g) => g.score)), tiles: best.tilesHit, partial: true }];
+    }
+  }
+  return [];
 }
