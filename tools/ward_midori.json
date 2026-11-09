@@ -1,0 +1,867 @@
+{
+ "ward": "名古屋市緑区",
+ "dpi": 160.6,
+ "pages": {
+  "kozui": {
+   "pdf": "kozui.pdf",
+   "page": 1,
+   "title": "洪水ハザードマップ（緑区）",
+   "category": "flood",
+   "source": "https://www.city.nagoya.jp/_res/projects/default_project/_page_/001/036/304/a1hm-kozui14midori.pdf"
+  },
+  "naisui": {
+   "pdf": "naisui.pdf",
+   "page": 1,
+   "title": "内水氾濫ハザードマップ（緑区）",
+   "category": "naisui",
+   "source": "https://www.city.nagoya.jp/_res/projects/default_project/_page_/001/036/304/a1hm-naisui14midori.pdf"
+  },
+  "takashio": {
+   "pdf": "takashio.pdf",
+   "page": 1,
+   "title": "高潮ハザードマップ（緑区）",
+   "category": "takashio",
+   "source": "https://www.city.nagoya.jp/_res/projects/default_project/_page_/001/036/304/a1hm-takashio14midori.pdf"
+  },
+  "jishin": {
+   "pdf": "jishin.pdf",
+   "page": 1,
+   "title": "地震ハザードマップ（緑区）",
+   "category": "jishin",
+   "source": "https://www.city.nagoya.jp/_res/projects/default_project/_page_/001/036/304/a1hm-jishin14midori.pdf"
+  },
+  "hinanjyo": {
+   "pdf": "hinanjyo.pdf",
+   "page": 1,
+   "title": "指定避難所マップ（緑区）",
+   "category": "hinan",
+   "source": "https://www.city.nagoya.jp/_res/projects/default_project/_page_/001/036/304/a1hm-hinanjyo14midori.pdf"
+  },
+  "tsunami": {
+   "pdf": "tsunami.pdf",
+   "page": 1,
+   "title": "津波ハザードマップ（瑞穂・南・緑区）",
+   "category": "tsunami",
+   "source": "https://www.city.nagoya.jp/_res/projects/default_project/_page_/001/036/304/a1hm-tsunami01mizuho-minami-midori.pdf"
+  },
+  "tameike-1": {
+   "pdf": "tameike.pdf",
+   "page": 1,
+   "title": "ため池ハザードマップ（緑区）p.1",
+   "category": "tameike",
+   "source": "https://www.city.nagoya.jp/_res/projects/default_project/_page_/001/036/304/a1hm-tameike14midori.pdf"
+  },
+  "tameike-2": {
+   "pdf": "tameike.pdf",
+   "page": 2,
+   "title": "ため池ハザードマップ（緑区）p.2",
+   "category": "tameike",
+   "source": "https://www.city.nagoya.jp/_res/projects/default_project/_page_/001/036/304/a1hm-tameike14midori.pdf"
+  }
+ },
+ "layouts": {
+  "flood_main": [
+   [
+    42,
+    0
+   ],
+   [
+    100,
+    0
+   ],
+   [
+    100,
+    43.5
+   ],
+   [
+    91.5,
+    43.5
+   ],
+   [
+    91.5,
+    54
+   ],
+   [
+    84,
+    54
+   ],
+   [
+    84,
+    61
+   ],
+   [
+    79,
+    61
+   ],
+   [
+    79,
+    80
+   ],
+   [
+    67.5,
+    80
+   ],
+   [
+    67.5,
+    100
+   ],
+   [
+    59,
+    100
+   ],
+   [
+    59,
+    71
+   ],
+   [
+    48,
+    71
+   ],
+   [
+    48,
+    66.5
+   ],
+   [
+    37.5,
+    66.5
+   ],
+   [
+    37.5,
+    52
+   ],
+   [
+    26.5,
+    52
+   ],
+   [
+    26.5,
+    41.5
+   ],
+   [
+    42,
+    41.5
+   ]
+  ],
+  "flood_inset": [
+   [
+    8,
+    6
+   ],
+   [
+    42,
+    6
+   ],
+   [
+    42,
+    41.5
+   ],
+   [
+    26.5,
+    41.5
+   ],
+   [
+    26.5,
+    52
+   ],
+   [
+    0,
+    52
+   ],
+   [
+    0,
+    22.5
+   ],
+   [
+    8,
+    22.5
+   ]
+  ]
+ },
+ "frames": [
+  {
+   "id": "kozui",
+   "page": "kozui",
+   "label": "",
+   "scale": 20000,
+   "poly": "flood_main",
+   "legend": "depth"
+  },
+  {
+   "id": "kozui-keizoku",
+   "page": "kozui",
+   "label": "浸水継続時間",
+   "scale": 35000,
+   "poly": "flood_inset",
+   "legend": "duration"
+  },
+  {
+   "id": "naisui",
+   "page": "naisui",
+   "label": "",
+   "scale": 20000,
+   "poly": "flood_main",
+   "legend": "depth"
+  },
+  {
+   "id": "naisui-keizoku",
+   "page": "naisui",
+   "label": "浸水継続時間",
+   "scale": 35000,
+   "poly": "flood_inset",
+   "legend": "duration"
+  },
+  {
+   "id": "takashio",
+   "page": "takashio",
+   "label": "",
+   "scale": 20000,
+   "poly": "flood_main",
+   "legend": "depth"
+  },
+  {
+   "id": "takashio-keizoku",
+   "page": "takashio",
+   "label": "浸水継続時間",
+   "scale": 35000,
+   "poly": "flood_inset",
+   "legend": "duration"
+  },
+  {
+   "id": "jishin",
+   "page": "jishin",
+   "label": "避難場所",
+   "scale": 20000,
+   "category": "hinan",
+   "poly": [
+    [
+     30,
+     0
+    ],
+    [
+     100,
+     0
+    ],
+    [
+     100,
+     48.5
+    ],
+    [
+     83.5,
+     48.5
+    ],
+    [
+     83.5,
+     57
+    ],
+    [
+     70.5,
+     57
+    ],
+    [
+     70.5,
+     76.5
+    ],
+    [
+     59,
+     76.5
+    ],
+    [
+     59,
+     88
+    ],
+    [
+     41,
+     88
+    ],
+    [
+     41,
+     57
+    ],
+    [
+     36,
+     57
+    ],
+    [
+     36,
+     40
+    ],
+    [
+     43,
+     40
+    ],
+    [
+     43,
+     6
+    ],
+    [
+     30,
+     6
+    ]
+   ]
+  },
+  {
+   "id": "jishin-shindo",
+   "page": "jishin",
+   "label": "震度",
+   "scale": 36000,
+   "poly": [
+    [
+     0,
+     60.5
+    ],
+    [
+     8,
+     60.5
+    ],
+    [
+     8,
+     57.5
+    ],
+    [
+     40.5,
+     57.5
+    ],
+    [
+     40.5,
+     80
+    ],
+    [
+     31,
+     80
+    ],
+    [
+     31,
+     100
+    ],
+    [
+     0,
+     100
+    ]
+   ],
+   "legend": "shindo",
+   "tolerance": 40
+  },
+  {
+   "id": "jishin-ekijoka",
+   "page": "jishin",
+   "label": "液状化",
+   "scale": 36000,
+   "poly": [
+    [
+     78,
+     57.5
+    ],
+    [
+     100,
+     57.5
+    ],
+    [
+     100,
+     80
+    ],
+    [
+     91,
+     80
+    ],
+    [
+     91,
+     100
+    ],
+    [
+     59,
+     100
+    ],
+    [
+     59,
+     76.5
+    ],
+    [
+     70.5,
+     76.5
+    ],
+    [
+     70.5,
+     60.5
+    ],
+    [
+     78,
+     60.5
+    ]
+   ],
+   "legend": "ekijoka",
+   "tolerance": 40
+  },
+  {
+   "id": "hinanjyo",
+   "page": "hinanjyo",
+   "label": "",
+   "scale": 20000,
+   "poly": [
+    [
+     60,
+     0
+    ],
+    [
+     100,
+     0
+    ],
+    [
+     100,
+     86
+    ],
+    [
+     84,
+     86
+    ],
+    [
+     84,
+     92
+    ],
+    [
+     63.5,
+     92
+    ],
+    [
+     63.5,
+     83.5
+    ],
+    [
+     43,
+     83.5
+    ],
+    [
+     43,
+     78
+    ],
+    [
+     32.5,
+     78
+    ],
+    [
+     32.5,
+     64.5
+    ],
+    [
+     0,
+     64.5
+    ],
+    [
+     0,
+     58.5
+    ],
+    [
+     26.5,
+     58.5
+    ],
+    [
+     26.5,
+     43.5
+    ],
+    [
+     41.5,
+     43.5
+    ],
+    [
+     41.5,
+     11
+    ],
+    [
+     29.5,
+     11
+    ],
+    [
+     29.5,
+     8.5
+    ],
+    [
+     45,
+     8.5
+    ],
+    [
+     45,
+     7
+    ],
+    [
+     60,
+     7
+    ]
+   ]
+  },
+  {
+   "id": "hinanjyo-chiban",
+   "page": "hinanjyo",
+   "label": "地盤高",
+   "scale": 35000,
+   "category": "chikei",
+   "poly": [
+    [
+     15.5,
+     11
+    ],
+    [
+     41.5,
+     11
+    ],
+    [
+     41.5,
+     43.5
+    ],
+    [
+     26.5,
+     43.5
+    ],
+    [
+     26.5,
+     56
+    ],
+    [
+     0,
+     56
+    ],
+    [
+     0,
+     37.5
+    ],
+    [
+     8.5,
+     37.5
+    ],
+    [
+     8.5,
+     15.5
+    ],
+    [
+     15.5,
+     15.5
+    ]
+   ]
+  },
+  {
+   "id": "tsunami",
+   "page": "tsunami",
+   "label": "津波避難ビル",
+   "scale": 18000,
+   "category": "hinan",
+   "poly": [
+    [
+     35,
+     0
+    ],
+    [
+     57,
+     0
+    ],
+    [
+     57,
+     11.5
+    ],
+    [
+     71.5,
+     11.5
+    ],
+    [
+     71.5,
+     87
+    ],
+    [
+     22,
+     87
+    ],
+    [
+     22,
+     13.5
+    ],
+    [
+     29.5,
+     13.5
+    ],
+    [
+     29.5,
+     6
+    ],
+    [
+     35,
+     6
+    ]
+   ]
+  },
+  {
+   "id": "tsunami-kijun",
+   "page": "tsunami",
+   "label": "基準水位",
+   "scale": 40000,
+   "poly": [
+    [
+     84,
+     0.5
+    ],
+    [
+     91,
+     0.5
+    ],
+    [
+     91,
+     4.5
+    ],
+    [
+     100,
+     4.5
+    ],
+    [
+     100,
+     18
+    ],
+    [
+     92,
+     18
+    ],
+    [
+     92,
+     29
+    ],
+    [
+     89,
+     29
+    ],
+    [
+     89,
+     47.5
+    ],
+    [
+     71.5,
+     47.5
+    ],
+    [
+     71.5,
+     4
+    ],
+    [
+     84,
+     4
+    ]
+   ],
+   "legend": "tsu_kijun"
+  },
+  {
+   "id": "tsunami-kaishi",
+   "page": "tsunami",
+   "label": "浸水開始時間",
+   "scale": 40000,
+   "poly": [
+    [
+     81,
+     48.5
+    ],
+    [
+     91,
+     48.5
+    ],
+    [
+     91,
+     52.5
+    ],
+    [
+     100,
+     52.5
+    ],
+    [
+     100,
+     82
+    ],
+    [
+     91.5,
+     82
+    ],
+    [
+     91.5,
+     96
+    ],
+    [
+     71.5,
+     96
+    ],
+    [
+     71.5,
+     52
+    ],
+    [
+     81,
+     52
+    ]
+   ],
+   "legend": "tsu_time"
+  },
+  {
+   "id": "tameike-1",
+   "page": "tameike-1",
+   "label": "",
+   "scale": 10000,
+   "poly": [
+    [
+     1,
+     36.5
+    ],
+    [
+     9,
+     36.5
+    ],
+    [
+     9,
+     25.5
+    ],
+    [
+     22,
+     25.5
+    ],
+    [
+     22,
+     30.5
+    ],
+    [
+     35.5,
+     30.5
+    ],
+    [
+     35.5,
+     23
+    ],
+    [
+     50.5,
+     23
+    ],
+    [
+     50.5,
+     1
+    ],
+    [
+     79.5,
+     1
+    ],
+    [
+     79.5,
+     20.5
+    ],
+    [
+     99,
+     20.5
+    ],
+    [
+     99,
+     86
+    ],
+    [
+     82,
+     86
+    ],
+    [
+     82,
+     94.5
+    ],
+    [
+     63,
+     94.5
+    ],
+    [
+     63,
+     99
+    ],
+    [
+     1,
+     99
+    ]
+   ],
+   "legend": "tameike"
+  },
+  {
+   "id": "tameike-2",
+   "page": "tameike-2",
+   "label": "",
+   "scale": 10000,
+   "poly": [
+    [
+     1,
+     36.5
+    ],
+    [
+     9,
+     36.5
+    ],
+    [
+     9,
+     25.5
+    ],
+    [
+     22,
+     25.5
+    ],
+    [
+     22,
+     7
+    ],
+    [
+     50.5,
+     7
+    ],
+    [
+     50.5,
+     1
+    ],
+    [
+     79.5,
+     1
+    ],
+    [
+     79.5,
+     20.5
+    ],
+    [
+     99,
+     20.5
+    ],
+    [
+     99,
+     89
+    ],
+    [
+     65,
+     89
+    ],
+    [
+     65,
+     94.5
+    ],
+    [
+     54.5,
+     94.5
+    ],
+    [
+     54.5,
+     99
+    ],
+    [
+     30.5,
+     99
+    ],
+    [
+     30.5,
+     81.5
+    ],
+    [
+     15.5,
+     81.5
+    ],
+    [
+     15.5,
+     75
+    ],
+    [
+     1,
+     75
+    ]
+   ],
+   "legend": "tameike"
+  }
+ ],
+ "key": "nagoya-midori",
+ "source": "https://www.city.nagoya.jp/bousaiportal/hazardmap/1036429/1036304.html"
+}
