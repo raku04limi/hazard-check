@@ -17,7 +17,12 @@ if not os.path.exists('georef_out.json') or '--fresh' in sys.argv:
     run('georef.py', os.environ.get('CFG', 'frames.json'))
 frames = cfg['frames']; scale = {f['id']: f['scale'] for f in frames}; page = {f['id']: f['page'] for f in frames}
 done = {}
+prev = json.load(open('georef_out.json')) if os.path.exists('georef_out.json') else {}
 for f in frames:
+    st = prev.get(f['id'], {}).get('stats')
+    if st and 'A' in prev[f['id']] and st['inliers'] >= 10 and st['inliers'] / max(1, st['good']) >= 0.8 and st['resid_m'] <= 4 and '--fresh' not in sys.argv:
+        done[f['id']] = (st['inliers'], round(100 * st['inliers'] / max(1, st['good'])), st['resid_m']); continue
+    if f['id'] not in prev: run('georef.py', os.environ.get('CFG', 'frames.json'), f['id'])
     r = ok(run('refine2.py', f['id']))
     if r: done[f['id']] = r
 for rnd in range(2):
