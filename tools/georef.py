@@ -4,7 +4,8 @@ Image.MAX_IMAGE_PIXELS=None
 cfg=json.load(open(sys.argv[1])); only=sys.argv[2:] 
 ox,oy=map(int,open('gsi16.origin').read().split())
 G=np.asarray(Image.open('gsi16.png').convert('L')).astype(np.float32)
-LAT=35.08
+import os
+LAT=float(os.environ.get('LAT','35.08'))
 M16=156543.03*math.cos(math.radians(LAT))/2**16
 def feat(a,s=1.2):
     gx=cv2.Sobel(a,cv2.CV_32F,1,0,ksize=3); gy=cv2.Sobel(a,cv2.CV_32F,0,1,ksize=3)

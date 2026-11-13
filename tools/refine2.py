@@ -1,12 +1,15 @@
 import json, math, sys, numpy as np, cv2
 from PIL import Image
 Image.MAX_IMAGE_PIXELS=None
+import os
 ids=sys.argv[1:]
+cfg=json.load(open(os.environ.get('CFG','frames.json')))
+PAGE={f['id']:f['page'] for f in cfg['frames']}
 go=json.load(open('georef_out.json'))
 ox,oy=map(int,open('gsi16.origin').read().split())
 G=np.asarray(Image.open('gsi16.png').convert('L')).astype(np.float32)
 gh,gw=G.shape
-M16=156543.03*math.cos(math.radians(35.08))/2**16
+M16=156543.03*math.cos(math.radians(float(os.environ.get('LAT','35.08'))))/2**16
 def feat(a):
     gx=cv2.Sobel(a,cv2.CV_32F,1,0,ksize=3); gy=cv2.Sobel(a,cv2.CV_32F,0,1,ksize=3)
     return cv2.GaussianBlur(np.minimum(np.hypot(gx,gy),200)/200,(0,0),1.2)
@@ -14,7 +17,7 @@ FG=feat(G)
 gx,gy=np.meshgrid(np.arange(gw,dtype=np.float32),np.arange(gh,dtype=np.float32))
 X18=(gx+ox)*4; Y18=(gy+oy)*4
 for fid in (ids or go.keys()):
-    g=go[fid]; page=fid if fid in ('tameike-1','tameike-2') else fid.split('-')[0]
+    g=go[fid]; page=PAGE[fid]
     P=np.asarray(Image.open(f'pages/{page}.png').convert('L')).astype(np.float32); H,W=P.shape
     pm=np.zeros((H,W),np.uint8); cv2.fillPoly(pm,[np.array(g['poly'],np.int32)],1)
     A=np.array(g.get('A',g['A0']))

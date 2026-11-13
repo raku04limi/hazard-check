@@ -1,0 +1,25 @@
+{
+ "key": "nagoya-chikusa",
+ "ward": "名古屋市千種区",
+ "dpi": 160.6,
+ "source": "https://www.city.nagoya.jp/bousaiportal/hazardmap/1036429/1036294.html",
+ "pages": {
+  "kozui":   {"title": "洪水ハザードマップ（千種区）", "category": "flood", "source": "https://www.city.nagoya.jp/_res/projects/default_project/_page_/001/036/294/a1hm-kozui01chikusa.pdf"},
+  "naisui":  {"title": "内水氾濫ハザードマップ（千種区）", "category": "naisui", "source": "https://www.city.nagoya.jp/_res/projects/default_project/_page_/001/036/294/a1hm-naisui01chikusa.pdf"},
+  "jishin":  {"title": "地震ハザードマップ（千種区）", "category": "jishin", "source": "https://www.city.nagoya.jp/_res/projects/default_project/_page_/001/036/294/a1hm-jishin01chikusa.pdf"},
+  "hinanjyo":{"title": "指定避難所マップ（千種区）", "category": "hinan", "source": "https://www.city.nagoya.jp/_res/projects/default_project/_page_/001/036/294/a1hm-hinanjyo01chikusa.pdf"},
+  "tameike": {"title": "ため池ハザードマップ（千種・東・名東区）", "category": "tameike", "source": "https://www.city.nagoya.jp/_res/projects/default_project/_page_/001/036/294/a1hm-tameike01chikusa-higashi-meito.pdf"}
+ },
+ "frames": [
+  {"id":"kozui","page":"kozui","label":"","scale":12000,"legend":"depth","poly":[[46,0],[69.5,0],[69.5,33.5],[77,33.5],[77,89],[44,89],[44,85.5],[30,85.5],[30,80.5],[1,80.5],[1,43.5],[8.5,43.5],[8.5,33],[16.5,33],[16.5,24.5],[21.5,24.5],[21.5,5.5],[31,5.5],[31,6.5],[46,6.5]]},
+  {"id":"kozui-keizoku","page":"kozui","label":"浸水継続時間","scale":30000,"legend":"duration","poly":[[78,0],[100,0],[100,33.5],[69.5,33.5],[69.5,14.5],[80,14.5],[80,3],[78,3]]},
+  {"id":"naisui","page":"naisui","label":"","scale":12000,"legend":"depth","poly":[[46,0],[69.5,0],[69.5,33.5],[77,33.5],[77,89],[44,89],[44,85.5],[30,85.5],[30,80.5],[1,80.5],[1,43.5],[8.5,43.5],[8.5,33],[16.5,33],[16.5,24.5],[21.5,24.5],[21.5,5.5],[31,5.5],[31,6.5],[46,6.5]]},
+  {"id":"naisui-keizoku","page":"naisui","label":"浸水継続時間","scale":30000,"legend":"duration","poly":[[78,0],[100,0],[100,33.5],[69.5,33.5],[69.5,14.5],[80,14.5],[80,3],[78,3]]},
+  {"id":"jishin","page":"jishin","label":"避難場所","scale":13000,"category":"hinan","poly":[[45,0],[100,0],[100,67],[75,67],[75,58.5],[54.5,58.5],[54.5,52],[48.5,52],[48.5,48.5],[28.5,48.5],[28.5,46.5],[0,46.5],[0,11],[23.5,11],[23.5,7.5],[45,7.5]]},
+  {"id":"jishin-shindo","page":"jishin","label":"震度","scale":26000,"legend":"shindo","tolerance":40,"poly":[[12.5,67.5],[36,67.5],[36,71],[50,71],[50,98.5],[0,98.5],[0,79.5],[12.5,79.5]]},
+  {"id":"jishin-ekijoka","page":"jishin","label":"液状化","scale":26000,"legend":"ekijoka","tolerance":40,"poly":[[63,67.5],[85,67.5],[85,71],[100,71],[100,98.5],[50.5,98.5],[50.5,79.5],[63,79.5]]},
+  {"id":"hinanjyo","page":"hinanjyo","label":"","scale":12000,"poly":[[42.5,0],[69.5,0],[69.5,51],[76.5,51],[76.5,36.5],[79.5,36.5],[79.5,91.5],[77.5,91.5],[77.5,86.5],[66,86.5],[66,91.5],[50,91.5],[50,98],[0,98],[0,19.5],[12.5,19.5],[12.5,10.5],[29.5,10.5],[29.5,6],[42.5,6]]},
+  {"id":"hinanjyo-chiban","page":"hinanjyo","label":"地盤高","scale":30000,"category":"chikei","poly":[[78,0],[100,0],[100,34.5],[76.5,34.5],[76.5,30],[69.5,30],[69.5,7],[78,7]]},
+  {"id":"tameike","page":"tameike","label":"","scale":10000,"legend":"tameike","poly":[[0,5.5],[39,5.5],[39,20],[66.5,20],[66.5,6.5],[75.5,6.5],[75.5,1],[99,1],[99,85.5],[82.5,85.5],[82.5,94],[63.5,94],[63.5,98.5],[31,98.5],[31,82.5],[16,82.5],[16,75],[0.5,75]]}
+ ]
+}

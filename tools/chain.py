@@ -1,9 +1,11 @@
 import json, sys, numpy as np, cv2
 from PIL import Image
 Image.MAX_IMAGE_PIXELS=None
-cfg=json.load(open('frames_midori.json')); go=json.load(open('georef_out.json'))
+import os
+cfg=json.load(open(os.environ.get('CFG','frames.json'))); go=json.load(open('georef_out.json'))
+PAGE={f['id']:f['page'] for f in cfg['frames']}
 scales={f['id']:f['scale'] for f in cfg['frames']}
-def page_of(fid): return fid if fid.startswith('tameike') else fid.split('-')[0]
+def page_of(fid): return PAGE[fid]
 def feat(a,s=1.0):
     gx=cv2.Sobel(a,cv2.CV_32F,1,0,ksize=3); gy=cv2.Sobel(a,cv2.CV_32F,0,1,ksize=3)
     return cv2.GaussianBlur(np.minimum(np.hypot(gx,gy),200)/200,(0,0),s)
