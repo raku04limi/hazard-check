@@ -16,10 +16,12 @@ rx0,ry0,rx1,ry1=go[tgt]['rect']
 if page_of(tgt)==page_of(ref): R=R.copy(); R[ry0:ry1,rx0:rx1]=255
 D=4
 tmpl=T[ry0:ry1,rx0:rx1]
-base=scales[tgt]/scales[ref]   # target px -> ref px  (target 1:10000 -> ref 1:20000 : 0.5)
+L=lambda v: v if isinstance(v,list) else [v]
+rs=[go[ref]['scale']] if 'scale' in go[ref] else L(scales[ref])
+bases=sorted({t/r for t in L(scales[tgt]) for r in rs})
 Rs=feat(cv2.resize(R,(R.shape[1]//D,R.shape[0]//D),interpolation=cv2.INTER_AREA))
 best=None
-for sc in np.linspace(0.96,1.04,9):
+for base,sc in [(b,x) for b in bases for x in np.linspace(0.96,1.04,9)]:
     s=base*sc
     t=cv2.resize(tmpl,(int(tmpl.shape[1]*s/D),int(tmpl.shape[0]*s/D)),interpolation=cv2.INTER_AREA)
     if t.shape[0]>=Rs.shape[0] or t.shape[1]>=Rs.shape[1]: 

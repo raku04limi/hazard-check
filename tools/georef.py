@@ -49,25 +49,32 @@ for fr in cfg['frames']:
     m=pip(xx+0.5,yy+0.5,polypx)
     ix0,iy0,ix1,iy1=inscribed(m)
     rx0,ry0,rx1,ry1=bx0+ix0*4,by0+iy0*4,bx0+ix1*4,by0+iy1*4
-    mpp=fr['scale']*0.0254/cfg['dpi']
-    f=mpp/M16               # page px -> gsi16 px
-    # coarse search: downscale everything by D
-    D=4
-    T=P[ry0:ry1,rx0:rx1]
-    Ts=cv2.resize(T,(max(8,int(T.shape[1]*f/D)),max(8,int(T.shape[0]*f/D))),interpolation=cv2.INTER_AREA)
-    Gs=cv2.resize(G,(G.shape[1]//D,G.shape[0]//D),interpolation=cv2.INTER_AREA)
-    best=None
-    for sc in [0.97,0.985,1.0,1.015,1.03]:
-        Tsc=cv2.resize(Ts,(int(Ts.shape[1]*sc),int(Ts.shape[0]*sc)),interpolation=cv2.INTER_AREA)
-        if Tsc.shape[0]>=Gs.shape[0] or Tsc.shape[1]>=Gs.shape[1]:
-            # template bigger than mosaic: crop the template center
-            cy,cx=Tsc.shape[0]//2,Tsc.shape[1]//2; hh=min(Tsc.shape[0],Gs.shape[0]-10)//2; hw=min(Tsc.shape[1],Gs.shape[1]-10)//2
-            Tsc=Tsc[cy-hh:cy+hh,cx-hw:cx+hw]; off=((Ts.shape[1]*sc)/2-hw,(Ts.shape[0]*sc)/2-hh)
-        else: off=(0,0)
-        r=cv2.matchTemplate(feat(Gs,1.0),feat(Tsc,1.0),cv2.TM_CCOEFF_NORMED)
-        _,mv,_,ml=cv2.minMaxLoc(r)
-        r2=r.copy(); r2[max(0,ml[1]-8):ml[1]+9,max(0,ml[0]-8):ml[0]+9]=-1
-        if best is None or mv>best[0]: best=(mv,sc,ml,off,mv-r2.max())
+    cands=fr['scale'] if isinstance(fr['scale'],list) else [fr['scale']]
+    BEST=None
+    for SCALE in cands:
+        mpp=SCALE*0.0254/cfg['dpi']
+        f=mpp/M16
+        # coarse search: downscale everything by D
+        D=4
+        T=P[ry0:ry1,rx0:rx1]
+        Ts=cv2.resize(T,(max(8,int(T.shape[1]*f/D)),max(8,int(T.shape[0]*f/D))),interpolation=cv2.INTER_AREA)
+        Gs=cv2.resize(G,(G.shape[1]//D,G.shape[0]//D),interpolation=cv2.INTER_AREA)
+        best=None
+        for sc in [0.97,0.985,1.0,1.015,1.03]:
+            Tsc=cv2.resize(Ts,(int(Ts.shape[1]*sc),int(Ts.shape[0]*sc)),interpolation=cv2.INTER_AREA)
+            if Tsc.shape[0]>=Gs.shape[0] or Tsc.shape[1]>=Gs.shape[1]:
+                # template bigger than mosaic: crop the template center
+                cy,cx=Tsc.shape[0]//2,Tsc.shape[1]//2; hh=min(Tsc.shape[0],Gs.shape[0]-10)//2; hw=min(Tsc.shape[1],Gs.shape[1]-10)//2
+                Tsc=Tsc[cy-hh:cy+hh,cx-hw:cx+hw]; off=((Ts.shape[1]*sc)/2-hw,(Ts.shape[0]*sc)/2-hh)
+            else: off=(0,0)
+            r=cv2.matchTemplate(feat(Gs,1.0),feat(Tsc,1.0),cv2.TM_CCOEFF_NORMED)
+            _,mv,_,ml=cv2.minMaxLoc(r)
+            r2=r.copy(); r2[max(0,ml[1]-8):ml[1]+9,max(0,ml[0]-8):ml[0]+9]=-1
+            if best is None or mv>best[0]: best=(mv,sc,ml,off,mv-r2.max())
+
+        if BEST is None or best[0]>BEST[0][0]: BEST=(best,f,SCALE)
+    best,f,SCALE=BEST
+    print(fr['id'],'scale',SCALE)
     mv,sc,ml,off,margin=best
     # page px (rx0,ry0) -> gsi16 px
     k=f*sc
@@ -75,5 +82,5 @@ for fr in cfg['frames']:
     # A: [X18,Y18,1] -> page px ; X16 = gx+ox ; page = (gx - gx0)/k + rx0
     A=np.array([[1/(4*k),0],[0,1/(4*k)],[-(ox+gx0)/k+rx0,-(oy+gy0)/k+ry0]])
     print(fr['id'],'coarse ncc',round(mv,3),'margin',round(margin,3),'scale adj',sc)
-    out[fr['id']]={'A0':A.tolist(),'coarse':[float(mv),float(margin)],'rect':[rx0,ry0,rx1,ry1],'poly':polypx,'W':W,'H':H}
+    out[fr['id']]={'A0':A.tolist(),'coarse':[float(mv),float(margin)],'rect':[rx0,ry0,rx1,ry1],'scale':SCALE,'poly':polypx,'W':W,'H':H}
     json.dump(out,open('georef_out.json','w'))
