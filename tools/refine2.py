@@ -7,20 +7,26 @@ cfg=json.load(open(os.environ.get('CFG','frames.json')))
 PAGE={f['id']:f['page'] for f in cfg['frames']}
 go=json.load(open('georef_out.json'))
 ox,oy=map(int,open('gsi16.origin').read().split())
-G=np.asarray(Image.open('gsi16.png').convert('L')).astype(np.float32)
-gh,gw=G.shape
+G8=np.asarray(Image.open('gsi16.png').convert('L'))
+GH,GW=G8.shape
 M16=156543.03*math.cos(math.radians(float(os.environ.get('LAT','35.08'))))/2**16
 def feat(a):
     gx=cv2.Sobel(a,cv2.CV_32F,1,0,ksize=3); gy=cv2.Sobel(a,cv2.CV_32F,0,1,ksize=3)
     return cv2.GaussianBlur(np.minimum(np.hypot(gx,gy),200)/200,(0,0),1.2)
-FG=feat(G)
-gx,gy=np.meshgrid(np.arange(gw,dtype=np.float32),np.arange(gh,dtype=np.float32))
-X18=(gx+ox)*4; Y18=(gy+oy)*4
 for fid in (ids or go.keys()):
     g=go[fid]; page=PAGE[fid]
     P=np.asarray(Image.open(f'pages/{page}.png').convert('L')).astype(np.float32); H,W=P.shape
     pm=np.zeros((H,W),np.uint8); cv2.fillPoly(pm,[np.array(g['poly'],np.int32)],1)
     A=np.array(g.get('A',g['A0']))
+    # 地図枠の範囲だけ地理院地図を切り出す（メモリ節約）
+    Ainv=np.linalg.inv(A[:2])
+    q=(np.array(g['poly'])-A[2])@Ainv
+    qx=q[:,0]/4-ox; qy=q[:,1]/4-oy; M=300
+    cx0=int(max(0,qx.min()-M)); cx1=int(min(GW,qx.max()+M)); cy0=int(max(0,qy.min()-M)); cy1=int(min(GH,qy.max()+M))
+    if cx1-cx0<200 or cy1-cy0<200: print(fid,'no patches'); continue
+    G=G8[cy0:cy1,cx0:cx1].astype(np.float32); gh,gw=G.shape; FG=feat(G)
+    gx,gy=np.meshgrid(np.arange(cx0,cx1,dtype=np.float32),np.arange(cy0,cy1,dtype=np.float32))
+    X18=(gx+ox)*4; Y18=(gy+oy)*4; del gx,gy
     for it in range(3):
         mapx=(X18*A[0,0]+Y18*A[1,0]+A[2,0]).astype(np.float32); mapy=(X18*A[0,1]+Y18*A[1,1]+A[2,1]).astype(np.float32)
         Wp=cv2.remap(P,mapx,mapy,cv2.INTER_AREA,borderValue=255)
@@ -37,7 +43,7 @@ for fid in (ids or go.keys()):
                 s=FG[y-Rr:y+Pz+Rr,x-Rr:x+Pz+Rr]
                 r=cv2.matchTemplate(s,t,cv2.TM_CCOEFF_NORMED); _,mv,_,ml=cv2.minMaxLoc(r)
                 r2=r.copy(); r2[max(0,ml[1]-5):ml[1]+6,max(0,ml[0]-5):ml[0]+6]=-1
-                res.append((x+Pz/2,y+Pz/2,ml[0]-Rr,ml[1]-Rr,mv,mv-r2.max()))
+                res.append((x+cx0+Pz/2,y+cy0+Pz/2,ml[0]-Rr,ml[1]-Rr,mv,mv-r2.max()))
         res=np.array(res)
         if len(res)==0: print(fid,'no patches'); break
         good=res[(res[:,4]>0.25)&(res[:,5]>0.03)]
@@ -52,8 +58,8 @@ for fid in (ids or go.keys()):
         frac=keep.sum()/len(good)
         print(fid,'it',it,'patches',len(res),'good',len(good),'inliers',keep.sum(),f'({frac:.0%})','median shift m',round(float(np.median(np.linalg.norm(d[keep],axis=1))*M16),1),'resid m',round(float(np.sqrt((e[keep]**2).mean())*M16),1))
         samp=[]
-        for yy in np.linspace(0,gh,15):
-            for xx in np.linspace(0,gw,15):
+        for yy in np.linspace(cy0,cy1,15):
+            for xx in np.linspace(cx0,cx1,15):
                 dq=np.array([xx,yy,1])@C; q=np.array([xx,yy])-dq
                 sx,sy=np.array([(q[0]+ox)*4,(q[1]+oy)*4,1])@A
                 samp.append([(xx+ox)*4,(yy+oy)*4,1,sx,sy])
