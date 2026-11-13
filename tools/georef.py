@@ -55,10 +55,18 @@ for fr in cfg['frames']:
         mpp=SCALE*0.0254/cfg['dpi']
         f=mpp/M16
         # coarse search: downscale everything by D
-        D=4
         T=P[ry0:ry1,rx0:rx1]
+        if 'center' in cfg:
+            # 区の中心付近だけを細かい解像度で探す
+            D=2; clon,clat=cfg['center']
+            n=256*2**16; ccx=(clon+180)/360*n-ox; rr=math.radians(clat); ccy=(1-math.log(math.tan(rr)+1/math.cos(rr))/math.pi)/2*n-oy
+            hw=int(T.shape[1]*f/2+cfg.get('search_px',1800)); hh=int(T.shape[0]*f/2+cfg.get('search_px',1800))
+            wx0=max(0,int(ccx-hw)); wy0=max(0,int(ccy-hh)); wx1=min(G.shape[1],int(ccx+hw)); wy1=min(G.shape[0],int(ccy+hh))
+            Gwin=G[wy0:wy1,wx0:wx1]
+        else:
+            D=4; wx0=wy0=0; Gwin=G
         Ts=cv2.resize(T,(max(8,int(T.shape[1]*f/D)),max(8,int(T.shape[0]*f/D))),interpolation=cv2.INTER_AREA)
-        Gs=cv2.resize(G,(G.shape[1]//D,G.shape[0]//D),interpolation=cv2.INTER_AREA)
+        Gs=cv2.resize(Gwin,(Gwin.shape[1]//D,Gwin.shape[0]//D),interpolation=cv2.INTER_AREA)
         best=None
         for sc in [0.97,0.985,1.0,1.015,1.03]:
             Tsc=cv2.resize(Ts,(int(Ts.shape[1]*sc),int(Ts.shape[0]*sc)),interpolation=cv2.INTER_AREA)
@@ -70,12 +78,12 @@ for fr in cfg['frames']:
             r=cv2.matchTemplate(feat(Gs,1.0),feat(Tsc,1.0),cv2.TM_CCOEFF_NORMED)
             _,mv,_,ml=cv2.minMaxLoc(r)
             r2=r.copy(); r2[max(0,ml[1]-8):ml[1]+9,max(0,ml[0]-8):ml[0]+9]=-1
-            if best is None or mv>best[0]: best=(mv,sc,ml,off,mv-r2.max())
+            if best is None or mv>best[0]: best=(mv,sc,(ml[0]+wx0/D,ml[1]+wy0/D),off,mv-r2.max(),D)
 
         if BEST is None or best[0]>BEST[0][0]: BEST=(best,f,SCALE)
     best,f,SCALE=BEST
     print(fr['id'],'scale',SCALE)
-    mv,sc,ml,off,margin=best
+    mv,sc,ml,off,margin,D=best
     # page px (rx0,ry0) -> gsi16 px
     k=f*sc
     gx0=(ml[0]-off[0])*D; gy0=(ml[1]-off[1])*D
