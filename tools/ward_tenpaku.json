@@ -1,0 +1,606 @@
+{
+ "key": "nagoya-tenpaku",
+ "ward": "名古屋市天白区",
+ "dpi": 160.6,
+ "source": "https://www.city.nagoya.jp/bousaiportal/hazardmap/1036429/1036298.html",
+ "pages": {
+  "kozui": {
+   "title": "洪水ハザードマップ（天白区）",
+   "category": "flood",
+   "source": "https://www.city.nagoya.jp/_res/projects/default_project/_page_/001/036/298/a1hm-kozui16tenpaku.pdf"
+  },
+  "naisui": {
+   "title": "内水氾濫ハザードマップ（天白区）",
+   "category": "naisui",
+   "source": "https://www.city.nagoya.jp/_res/projects/default_project/_page_/001/036/298/a1hm-naisui16tenpaku.pdf"
+  },
+  "takashio": {
+   "title": "高潮ハザードマップ（天白区）",
+   "category": "takashio",
+   "source": "https://www.city.nagoya.jp/_res/projects/default_project/_page_/001/036/298/a1hm-takashio16tenpaku.pdf"
+  },
+  "jishin": {
+   "title": "地震ハザードマップ（天白区）",
+   "category": "jishin",
+   "source": "https://www.city.nagoya.jp/_res/projects/default_project/_page_/001/036/298/a1hm-jishin16tenpaku.pdf"
+  },
+  "hinanjyo": {
+   "title": "指定避難所マップ（天白区）",
+   "category": "hinan",
+   "source": "https://www.city.nagoya.jp/_res/projects/default_project/_page_/001/036/298/a1hm-hinanjyo16tenpaku.pdf"
+  },
+  "tameike": {
+   "title": "ため池ハザードマップ（天白区）",
+   "category": "tameike",
+   "source": "https://www.city.nagoya.jp/_res/projects/default_project/_page_/001/036/298/a1hm-tameike16tenpaku.pdf"
+  }
+ },
+ "frames": [
+  {
+   "id": "kozui",
+   "page": "kozui",
+   "poly": [
+    [
+     50,
+     4
+    ],
+    [
+     72,
+     4
+    ],
+    [
+     72,
+     13
+    ],
+    [
+     78,
+     13
+    ],
+    [
+     78,
+     26
+    ],
+    [
+     85,
+     26
+    ],
+    [
+     85,
+     31
+    ],
+    [
+     100,
+     31
+    ],
+    [
+     100,
+     100
+    ],
+    [
+     24,
+     100
+    ],
+    [
+     24,
+     75
+    ],
+    [
+     35,
+     75
+    ],
+    [
+     35,
+     44
+    ],
+    [
+     30,
+     44
+    ],
+    [
+     30,
+     25
+    ],
+    [
+     50,
+     25
+    ]
+   ],
+   "label": "",
+   "scale": [
+    12000
+   ],
+   "legend": "depth"
+  },
+  {
+   "id": "kozui-keizoku",
+   "page": "kozui",
+   "poly": [
+    [
+     0,
+     6
+    ],
+    [
+     30,
+     6
+    ],
+    [
+     30,
+     44
+    ],
+    [
+     0,
+     44
+    ]
+   ],
+   "label": "浸水継続時間",
+   "scale": [
+    25000,
+    28000,
+    30000,
+    35000,
+    40000
+   ],
+   "legend": "duration"
+  },
+  {
+   "id": "naisui",
+   "page": "naisui",
+   "poly": [
+    [
+     50,
+     4
+    ],
+    [
+     72,
+     4
+    ],
+    [
+     72,
+     13
+    ],
+    [
+     78,
+     13
+    ],
+    [
+     78,
+     26
+    ],
+    [
+     85,
+     26
+    ],
+    [
+     85,
+     31
+    ],
+    [
+     100,
+     31
+    ],
+    [
+     100,
+     100
+    ],
+    [
+     24,
+     100
+    ],
+    [
+     24,
+     75
+    ],
+    [
+     35,
+     75
+    ],
+    [
+     35,
+     44
+    ],
+    [
+     30,
+     44
+    ],
+    [
+     30,
+     25
+    ],
+    [
+     50,
+     25
+    ]
+   ],
+   "label": "",
+   "scale": [
+    12000
+   ],
+   "legend": "depth"
+  },
+  {
+   "id": "naisui-keizoku",
+   "page": "naisui",
+   "poly": [
+    [
+     0,
+     6
+    ],
+    [
+     30,
+     6
+    ],
+    [
+     30,
+     44
+    ],
+    [
+     0,
+     44
+    ]
+   ],
+   "label": "浸水継続時間",
+   "scale": [
+    25000,
+    28000,
+    30000,
+    35000,
+    40000
+   ],
+   "legend": "duration"
+  },
+  {
+   "id": "takashio",
+   "page": "takashio",
+   "poly": [
+    [
+     50,
+     4
+    ],
+    [
+     72,
+     4
+    ],
+    [
+     72,
+     13
+    ],
+    [
+     78,
+     13
+    ],
+    [
+     78,
+     26
+    ],
+    [
+     85,
+     26
+    ],
+    [
+     85,
+     31
+    ],
+    [
+     100,
+     31
+    ],
+    [
+     100,
+     100
+    ],
+    [
+     24,
+     100
+    ],
+    [
+     24,
+     75
+    ],
+    [
+     35,
+     75
+    ],
+    [
+     35,
+     44
+    ],
+    [
+     30,
+     44
+    ],
+    [
+     30,
+     25
+    ],
+    [
+     50,
+     25
+    ]
+   ],
+   "label": "",
+   "scale": [
+    12000
+   ],
+   "legend": "depth"
+  },
+  {
+   "id": "takashio-keizoku",
+   "page": "takashio",
+   "poly": [
+    [
+     0,
+     6
+    ],
+    [
+     30,
+     6
+    ],
+    [
+     30,
+     44
+    ],
+    [
+     0,
+     44
+    ]
+   ],
+   "label": "浸水継続時間",
+   "scale": [
+    25000,
+    28000,
+    30000,
+    35000,
+    40000
+   ],
+   "legend": "duration"
+  },
+  {
+   "id": "jishin",
+   "page": "jishin",
+   "poly": [
+    [
+     19,
+     15
+    ],
+    [
+     64,
+     15
+    ],
+    [
+     64,
+     100
+    ],
+    [
+     0,
+     100
+    ],
+    [
+     0,
+     60
+    ],
+    [
+     19,
+     60
+    ]
+   ],
+   "label": "避難場所",
+   "scale": [
+    12000,
+    13000
+   ],
+   "category": "hinan"
+  },
+  {
+   "id": "jishin-shindo",
+   "page": "jishin",
+   "poly": [
+    [
+     64,
+     4
+    ],
+    [
+     90,
+     4
+    ],
+    [
+     90,
+     15
+    ],
+    [
+     100,
+     15
+    ],
+    [
+     100,
+     50
+    ],
+    [
+     64,
+     50
+    ]
+   ],
+   "label": "震度",
+   "scale": [
+    25000,
+    28000,
+    30000,
+    35000,
+    40000
+   ],
+   "legend": "shindo",
+   "tolerance": 40
+  },
+  {
+   "id": "jishin-ekijoka",
+   "page": "jishin",
+   "poly": [
+    [
+     64,
+     52
+    ],
+    [
+     90,
+     52
+    ],
+    [
+     90,
+     66
+    ],
+    [
+     100,
+     66
+    ],
+    [
+     100,
+     100
+    ],
+    [
+     64,
+     100
+    ]
+   ],
+   "label": "液状化",
+   "scale": [
+    25000,
+    28000,
+    30000,
+    35000,
+    40000
+   ],
+   "legend": "ekijoka",
+   "tolerance": 40
+  },
+  {
+   "id": "hinanjyo",
+   "page": "hinanjyo",
+   "poly": [
+    [
+     30,
+     4
+    ],
+    [
+     100,
+     4
+    ],
+    [
+     100,
+     100
+    ],
+    [
+     33,
+     100
+    ],
+    [
+     33,
+     50
+    ],
+    [
+     30,
+     50
+    ]
+   ],
+   "label": "",
+   "scale": [
+    12000
+   ]
+  },
+  {
+   "id": "hinanjyo-chiban",
+   "page": "hinanjyo",
+   "poly": [
+    [
+     0,
+     12
+    ],
+    [
+     28,
+     12
+    ],
+    [
+     28,
+     50
+    ],
+    [
+     0,
+     50
+    ]
+   ],
+   "label": "地盤高",
+   "scale": [
+    25000,
+    28000,
+    30000,
+    35000,
+    40000
+   ],
+   "category": "chikei"
+  },
+  {
+   "id": "tameike",
+   "page": "tameike",
+   "poly": [
+    [
+     21,
+     4
+    ],
+    [
+     85,
+     4
+    ],
+    [
+     85,
+     70
+    ],
+    [
+     100,
+     70
+    ],
+    [
+     100,
+     90
+    ],
+    [
+     80,
+     90
+    ],
+    [
+     80,
+     100
+    ],
+    [
+     0,
+     100
+    ],
+    [
+     0,
+     45
+    ],
+    [
+     8,
+     45
+    ],
+    [
+     8,
+     30
+    ],
+    [
+     21,
+     30
+    ]
+   ],
+   "label": "",
+   "scale": [
+    10000,
+    12000,
+    12500,
+    13000,
+    15000
+   ],
+   "legend": "tameike"
+  }
+ ],
+ "center": [
+  136.975,
+  35.123
+ ]
+}

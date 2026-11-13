@@ -1,5 +1,5 @@
 // オフラインでもアプリ本体を開けるようにするキャッシュ（地図データはキャッシュしない）
-const CACHE = 'hazard-check-v2.0.0';
+const CACHE = 'hazard-check-v2.1.0';
 const SHELL = [
   './', 'index.html', 'css/style.css', 'manifest.webmanifest',
   'js/app.js', 'js/remotemaps.js', 'js/hazard.js', 'js/geo.js', 'js/db.js',

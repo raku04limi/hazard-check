@@ -1,7 +1,7 @@
 import { CATEGORIES, LEVELS, NATIONAL_LAYERS, evaluateNational, geocode } from './hazard.js';
 import { db, uid } from './db.js';
 import { MAP_CATEGORIES, isVisualOnly, loadIndex, framesAt, evalFrame, snippet, parseDepth, rgbHex } from './remotemaps.js';
-const VERSION = '2.0.0';
+const VERSION = '2.1.0';
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -167,9 +167,17 @@ function buildCategories(nat, pdfs, floor, loc) {
       it.regional = true;
       it.note = (it.note ? it.note + ' / ' : '') + '震度は市内の広い範囲で同程度の想定のため、総合評価には含めていません';
     }
-    target.items.push(floorAdjust(it, floor));
+    it = floorAdjust(it, floor);
+    // 区の境目では隣の区の地図も重なるので、同じ種類の地図は危険度が最も高い1件にまとめる
+    const gkey = m.category + '|' + (m.label || '');
+    const prev = target.items.find((x) => x.gkey === gkey);
+    if (prev) {
+      prev.dup = (prev.dup || 0) + 1;
+      if ((it.level ?? -1) > (prev.level ?? -1)) { Object.assign(it, { gkey, dup: prev.dup }); target.items[target.items.indexOf(prev)] = it; }
+    } else { it.gkey = gkey; target.items.push(it); }
     target.city = true;
   }
+  for (const c of Object.values(cats)) for (const it of c.items) if (it.dup) it.note = (it.note ? it.note + ' / ' : '') + `隣接区の地図${it.dup}枚とも照合（最も危険度の高い結果を表示）`;
 
   for (const c of Object.values(cats)) {
     const lv = c.items.map((i) => i.level).filter((v) => v != null);
