@@ -1,0 +1,389 @@
+{
+ "key": "nagoya-naka",
+ "ward": "名古屋市中区",
+ "dpi": 160.6,
+ "source": "https://www.city.nagoya.jp/bousaiportal/hazardmap/1036429/1036295.html",
+ "pages": {
+  "kozui": {
+   "title": "洪水ハザードマップ（中区）",
+   "category": "flood",
+   "source": "https://www.city.nagoya.jp/_res/projects/default_project/_page_/001/036/295/a1hm-kozui06naka.pdf"
+  },
+  "naisui": {
+   "title": "内水氾濫ハザードマップ（中区）",
+   "category": "naisui",
+   "source": "https://www.city.nagoya.jp/_res/projects/default_project/_page_/001/036/295/a1hm-naisui06naka.pdf"
+  },
+  "takashio": {
+   "title": "高潮ハザードマップ（中区）",
+   "category": "takashio",
+   "source": "https://www.city.nagoya.jp/_res/projects/default_project/_page_/001/036/295/a1hm-takashio06naka.pdf"
+  },
+  "jishin": {
+   "title": "地震ハザードマップ（中区）",
+   "category": "jishin",
+   "source": "https://www.city.nagoya.jp/_res/projects/default_project/_page_/001/036/295/a1hm-jishin06naka.pdf"
+  },
+  "hinanjyo": {
+   "title": "指定避難所マップ（中区）",
+   "category": "hinan",
+   "source": "https://www.city.nagoya.jp/_res/projects/default_project/_page_/001/036/295/a1hm-hinanjyo06naka.pdf"
+  }
+ },
+ "frames": [
+  {
+   "id": "kozui",
+   "page": "kozui",
+   "label": "",
+   "scale": 9000,
+   "legend": "depth",
+   "poly": [
+    [
+     51,
+     4.5
+    ],
+    [
+     69.5,
+     4.5
+    ],
+    [
+     69.5,
+     32
+    ],
+    [
+     100,
+     32
+    ],
+    [
+     100,
+     69
+    ],
+    [
+     67,
+     69
+    ],
+    [
+     67,
+     87
+    ],
+    [
+     57,
+     87
+    ],
+    [
+     57,
+     92
+    ],
+    [
+     39,
+     92
+    ],
+    [
+     39,
+     86.5
+    ],
+    [
+     0,
+     86.5
+    ],
+    [
+     0,
+     25
+    ],
+    [
+     12.5,
+     25
+    ],
+    [
+     12.5,
+     17
+    ],
+    [
+     29.5,
+     17
+    ],
+    [
+     29.5,
+     9.5
+    ],
+    [
+     51,
+     9.5
+    ]
+   ]
+  },
+  {
+   "id": "naisui",
+   "page": "naisui",
+   "label": "",
+   "scale": 9000,
+   "legend": "depth",
+   "poly": [
+    [
+     37,
+     4.5
+    ],
+    [
+     69.5,
+     4.5
+    ],
+    [
+     69.5,
+     32
+    ],
+    [
+     100,
+     32
+    ],
+    [
+     100,
+     69
+    ],
+    [
+     67,
+     69
+    ],
+    [
+     67,
+     90
+    ],
+    [
+     0,
+     90
+    ],
+    [
+     0,
+     25
+    ],
+    [
+     12.5,
+     25
+    ],
+    [
+     12.5,
+     17
+    ],
+    [
+     29.5,
+     17
+    ],
+    [
+     29.5,
+     4.5
+    ]
+   ]
+  },
+  {
+   "id": "takashio",
+   "page": "takashio",
+   "label": "",
+   "scale": 9000,
+   "legend": "depth",
+   "poly": [
+    [
+     37,
+     4.5
+    ],
+    [
+     69.5,
+     4.5
+    ],
+    [
+     69.5,
+     32
+    ],
+    [
+     100,
+     32
+    ],
+    [
+     100,
+     69
+    ],
+    [
+     67,
+     69
+    ],
+    [
+     67,
+     90
+    ],
+    [
+     0,
+     90
+    ],
+    [
+     0,
+     25
+    ],
+    [
+     12.5,
+     25
+    ],
+    [
+     12.5,
+     17
+    ],
+    [
+     29.5,
+     17
+    ],
+    [
+     29.5,
+     4.5
+    ]
+   ]
+  },
+  {
+   "id": "jishin",
+   "page": "jishin",
+   "label": "避難場所",
+   "scale": 10000,
+   "category": "hinan",
+   "poly": [
+    [
+     24,
+     0
+    ],
+    [
+     51,
+     0
+    ],
+    [
+     51,
+     15
+    ],
+    [
+     66.5,
+     15
+    ],
+    [
+     66.5,
+     97.5
+    ],
+    [
+     18.5,
+     97.5
+    ],
+    [
+     18.5,
+     39
+    ],
+    [
+     0,
+     39
+    ],
+    [
+     0,
+     5
+    ],
+    [
+     24,
+     5
+    ]
+   ]
+  },
+  {
+   "id": "jishin-shindo",
+   "page": "jishin",
+   "label": "震度",
+   "scale": 21000,
+   "legend": "shindo",
+   "tolerance": 40,
+   "poly": [
+    [
+     75,
+     2.5
+    ],
+    [
+     100,
+     2.5
+    ],
+    [
+     100,
+     48.5
+    ],
+    [
+     67,
+     48.5
+    ],
+    [
+     67,
+     17.5
+    ],
+    [
+     75,
+     17.5
+    ]
+   ]
+  },
+  {
+   "id": "hinanjyo",
+   "page": "hinanjyo",
+   "label": "",
+   "scale": 9000,
+   "poly": [
+    [
+     41,
+     0
+    ],
+    [
+     61,
+     0
+    ],
+    [
+     61,
+     30.5
+    ],
+    [
+     100,
+     30.5
+    ],
+    [
+     100,
+     72
+    ],
+    [
+     80,
+     72
+    ],
+    [
+     80,
+     77
+    ],
+    [
+     71,
+     77
+    ],
+    [
+     71,
+     98.5
+    ],
+    [
+     0,
+     98.5
+    ],
+    [
+     0,
+     16
+    ],
+    [
+     30,
+     16
+    ],
+    [
+     30,
+     6.5
+    ],
+    [
+     41,
+     6.5
+    ]
+   ]
+  }
+ ],
+ "center": [
+  136.905,
+  35.164
+ ]
+}

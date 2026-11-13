@@ -22,6 +22,7 @@ for tx in range(int((cx - R) // 256), int((cx + R) // 256) + 1):
 cells.append(('GSI', g.resize((240, 240))))
 pages = {}
 for fid, gd in go.items():
+    if fid not in page_of or 'A' not in gd: continue
     A = np.array(gd['A']); u, v = np.array([X, Y, 1]) @ A
     k = math.sqrt(abs(np.linalg.det(A[:2, :2]))); r = half / mpp18 * k
     pg = page_of[fid]
