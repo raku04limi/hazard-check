@@ -60,7 +60,7 @@
    "source": "https://www.city.ichinomiya.aichi.jp/"
   },
   "khm10": {
-   "title": "洪水ハザードマップ 想定最大規模（一宮市）",
+   "title": "洪水ハザードマップ 想定最大規模（一宮市・木曽川を含む）",
    "category": "flood",
    "source": "https://www.city.ichinomiya.aichi.jp/"
   }
@@ -632,7 +632,7 @@
   {
    "id": "khm10",
    "page": "khm10",
-   "label": "想定最大規模",
+   "label": "",
    "scale": [
     19000,
     20000,

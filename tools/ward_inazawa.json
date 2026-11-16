@@ -1,0 +1,615 @@
+{
+ "key": "inazawa",
+ "ward": "愛知県稲沢市",
+ "dpi": 160.6,
+ "center": [
+  136.8,
+  35.25
+ ],
+ "search_px": 2600,
+ "source": "https://www.city.inazawa.aichi.jp/",
+ "pages": {
+  "seibu": {
+   "title": "洪水ハザードマップ 西部版（稲沢市・木曽川以外の河川）",
+   "category": "flood",
+   "source": "https://www.city.inazawa.aichi.jp/"
+  },
+  "chubu": {
+   "title": "洪水ハザードマップ 中部版（稲沢市・木曽川以外の河川）",
+   "category": "flood",
+   "source": "https://www.city.inazawa.aichi.jp/"
+  },
+  "toubu": {
+   "title": "洪水ハザードマップ 東部版（稲沢市・木曽川以外の河川）",
+   "category": "flood",
+   "source": "https://www.city.inazawa.aichi.jp/"
+  },
+  "naisui_depth": {
+   "title": "雨水出水浸水想定区域図 想定最大規模（稲沢市）",
+   "category": "naisui",
+   "source": "https://www.city.inazawa.aichi.jp/"
+  },
+  "naisui_keizoku": {
+   "title": "雨水出水浸水想定区域図 浸水継続時間（稲沢市）",
+   "category": "naisui",
+   "source": "https://www.city.inazawa.aichi.jp/"
+  },
+  "naisui_h28": {
+   "title": "内水浸水想定区域図 平成28年9月実績降雨（稲沢市）",
+   "category": "naisui",
+   "source": "https://www.city.inazawa.aichi.jp/"
+  },
+  "kuni_shindo": {
+   "title": "地震動マップ 南海トラフ（国の想定・稲沢市）",
+   "category": "jishin",
+   "source": "https://www.city.inazawa.aichi.jp/"
+  },
+  "ken_shindo": {
+   "title": "地震動マップ 南海トラフ（愛知県の想定・稲沢市）",
+   "category": "jishin",
+   "source": "https://www.city.inazawa.aichi.jp/"
+  },
+  "kuni_ekijoka": {
+   "title": "液状化危険度予測マップ（稲沢市）",
+   "category": "jishin",
+   "source": "https://www.city.inazawa.aichi.jp/"
+  }
+ },
+ "frames": [
+  {
+   "id": "seibu",
+   "page": "seibu",
+   "label": "",
+   "scale": [
+    14000,
+    15000,
+    16000
+   ],
+   "legend": "ina_flood",
+   "tolerance": 0.016,
+   "poly": [
+    [
+     30,
+     2
+    ],
+    [
+     100,
+     2
+    ],
+    [
+     100,
+     99
+    ],
+    [
+     43,
+     99
+    ],
+    [
+     43,
+     90
+    ],
+    [
+     27,
+     90
+    ],
+    [
+     27,
+     73
+    ],
+    [
+     25,
+     73
+    ],
+    [
+     25,
+     10
+    ],
+    [
+     30,
+     10
+    ]
+   ],
+   "match": "chroma"
+  },
+  {
+   "id": "chubu",
+   "page": "chubu",
+   "label": "",
+   "scale": [
+    14000,
+    15000,
+    16000
+   ],
+   "legend": "ina_flood",
+   "tolerance": 0.016,
+   "poly": [
+    [
+     36,
+     2
+    ],
+    [
+     100,
+     2
+    ],
+    [
+     100,
+     86
+    ],
+    [
+     78,
+     86
+    ],
+    [
+     78,
+     99
+    ],
+    [
+     47,
+     99
+    ],
+    [
+     47,
+     84
+    ],
+    [
+     28,
+     84
+    ],
+    [
+     28,
+     73
+    ],
+    [
+     43,
+     73
+    ],
+    [
+     43,
+     47
+    ],
+    [
+     25,
+     47
+    ],
+    [
+     25,
+     12
+    ],
+    [
+     36,
+     12
+    ]
+   ],
+   "match": "chroma"
+  },
+  {
+   "id": "toubu",
+   "page": "toubu",
+   "label": "",
+   "scale": [
+    14000,
+    15000,
+    16000
+   ],
+   "legend": "ina_flood",
+   "tolerance": 0.016,
+   "poly": [
+    [
+     36,
+     3
+    ],
+    [
+     97,
+     3
+    ],
+    [
+     97,
+     85
+    ],
+    [
+     70,
+     85
+    ],
+    [
+     70,
+     96
+    ],
+    [
+     47,
+     96
+    ],
+    [
+     47,
+     90
+    ],
+    [
+     29,
+     90
+    ],
+    [
+     29,
+     60
+    ],
+    [
+     27,
+     60
+    ],
+    [
+     27,
+     16
+    ],
+    [
+     36,
+     16
+    ]
+   ],
+   "match": "chroma"
+  },
+  {
+   "id": "naisui_depth",
+   "page": "naisui_depth",
+   "label": "想定最大規模",
+   "scale": [
+    15000,
+    16000,
+    17000
+   ],
+   "legend": "ina_naisui",
+   "tolerance": 14,
+   "poly": [
+    [
+     5,
+     33
+    ],
+    [
+     31,
+     33
+    ],
+    [
+     31,
+     28
+    ],
+    [
+     44,
+     28
+    ],
+    [
+     44,
+     42
+    ],
+    [
+     52,
+     42
+    ],
+    [
+     52,
+     16
+    ],
+    [
+     58,
+     16
+    ],
+    [
+     67,
+     49
+    ],
+    [
+     62,
+     64
+    ],
+    [
+     52,
+     62
+    ],
+    [
+     44,
+     60
+    ],
+    [
+     42,
+     59
+    ],
+    [
+     35,
+     60
+    ],
+    [
+     20,
+     66
+    ],
+    [
+     14,
+     64
+    ],
+    [
+     4,
+     56
+    ]
+   ]
+  },
+  {
+   "id": "naisui_keizoku",
+   "page": "naisui_keizoku",
+   "label": "浸水継続時間",
+   "scale": [
+    15000,
+    16000,
+    17000
+   ],
+   "legend": "ina_keizoku",
+   "tolerance": 40,
+   "poly": [
+    [
+     5,
+     33
+    ],
+    [
+     31,
+     33
+    ],
+    [
+     31,
+     28
+    ],
+    [
+     44,
+     28
+    ],
+    [
+     44,
+     42
+    ],
+    [
+     52,
+     42
+    ],
+    [
+     52,
+     16
+    ],
+    [
+     58,
+     16
+    ],
+    [
+     67,
+     49
+    ],
+    [
+     62,
+     64
+    ],
+    [
+     52,
+     62
+    ],
+    [
+     44,
+     60
+    ],
+    [
+     42,
+     59
+    ],
+    [
+     35,
+     60
+    ],
+    [
+     20,
+     66
+    ],
+    [
+     14,
+     64
+    ],
+    [
+     4,
+     56
+    ]
+   ]
+  },
+  {
+   "id": "naisui_h28",
+   "page": "naisui_h28",
+   "label": "平成28年9月実績降雨",
+   "scale": [
+    15000,
+    16000,
+    17000
+   ],
+   "legend": "ina_naisui",
+   "tolerance": 14,
+   "poly": [
+    [
+     5,
+     33
+    ],
+    [
+     31,
+     33
+    ],
+    [
+     31,
+     28
+    ],
+    [
+     44,
+     28
+    ],
+    [
+     44,
+     42
+    ],
+    [
+     52,
+     42
+    ],
+    [
+     52,
+     16
+    ],
+    [
+     58,
+     16
+    ],
+    [
+     67,
+     49
+    ],
+    [
+     62,
+     64
+    ],
+    [
+     52,
+     62
+    ],
+    [
+     44,
+     60
+    ],
+    [
+     42,
+     59
+    ],
+    [
+     35,
+     60
+    ],
+    [
+     20,
+     66
+    ],
+    [
+     14,
+     64
+    ],
+    [
+     4,
+     56
+    ]
+   ]
+  },
+  {
+   "id": "kuni_shindo",
+   "page": "kuni_shindo",
+   "label": "震度（国の想定）",
+   "scale": [
+    38000,
+    40000,
+    42000,
+    44000,
+    46000
+   ],
+   "legend": "ina_shindo_kuni",
+   "tolerance": 30,
+   "poly": [
+    [
+     0,
+     9
+    ],
+    [
+     100,
+     9
+    ],
+    [
+     100,
+     68
+    ],
+    [
+     89,
+     68
+    ],
+    [
+     89,
+     99
+    ],
+    [
+     0,
+     99
+    ]
+   ]
+  },
+  {
+   "id": "ken_shindo",
+   "page": "ken_shindo",
+   "label": "震度",
+   "scale": [
+    38000,
+    40000,
+    42000,
+    44000,
+    46000
+   ],
+   "legend": "ina_shindo_ken",
+   "tolerance": 30,
+   "poly": [
+    [
+     0,
+     9
+    ],
+    [
+     100,
+     9
+    ],
+    [
+     100,
+     68
+    ],
+    [
+     87,
+     68
+    ],
+    [
+     87,
+     99
+    ],
+    [
+     0,
+     99
+    ]
+   ]
+  },
+  {
+   "id": "kuni_ekijoka",
+   "page": "kuni_ekijoka",
+   "label": "液状化",
+   "scale": [
+    38000,
+    40000,
+    42000,
+    44000,
+    46000
+   ],
+   "legend": "ina_ekijoka",
+   "tolerance": 30,
+   "poly": [
+    [
+     0,
+     9
+    ],
+    [
+     100,
+     9
+    ],
+    [
+     100,
+     88
+    ],
+    [
+     85,
+     88
+    ],
+    [
+     85,
+     99
+    ],
+    [
+     0,
+     99
+    ]
+   ]
+  }
+ ]
+}
