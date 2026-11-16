@@ -40,16 +40,16 @@ export const HERO = `<svg class="hero-art" viewBox="0 0 360 150" preserveAspectR
     <g stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".8"><path d="M262 66l-3 8"/><path d="M274 66l-3 8"/><path d="M286 66l-3 8"/></g>
     <circle cx="58" cy="34" r="14" fill="#fde68a"/>
   </g>
-  <path d="M0 112 52 86l38 14 46-30 54 30 44-20 64 26 62-18v82H0z" fill="#a7f3d0" opacity=".55"/>
+  <path d="M0 112 52 86l38 14 46-30 54 30 44-20 64 26 62-18v82H0z" fill="#d9f99d" opacity=".55"/>
   <g>
     <rect x="96" y="78" width="40" height="38" rx="4" fill="#fff"/>
     <path d="M90 82 116 60l26 22z" fill="#fb7185"/>
-    <rect x="110" y="96" width="12" height="20" rx="2" fill="#6366f1"/>
+    <rect x="110" y="96" width="12" height="20" rx="2" fill="#16a34a"/>
     <rect x="148" y="62" width="30" height="54" rx="4" fill="#fff"/>
-    <g fill="#c7d2fe"><rect x="154" y="70" width="7" height="7" rx="1.5"/><rect x="165" y="70" width="7" height="7" rx="1.5"/><rect x="154" y="82" width="7" height="7" rx="1.5"/><rect x="165" y="82" width="7" height="7" rx="1.5"/><rect x="154" y="94" width="7" height="7" rx="1.5"/><rect x="165" y="94" width="7" height="7" rx="1.5"/></g>
+    <g fill="#bbf7d0"><rect x="154" y="70" width="7" height="7" rx="1.5"/><rect x="165" y="70" width="7" height="7" rx="1.5"/><rect x="154" y="82" width="7" height="7" rx="1.5"/><rect x="165" y="82" width="7" height="7" rx="1.5"/><rect x="154" y="94" width="7" height="7" rx="1.5"/><rect x="165" y="94" width="7" height="7" rx="1.5"/></g>
     <rect x="190" y="86" width="36" height="30" rx="4" fill="#fff"/>
     <path d="M185 90l23-19 23 19z" fill="#fbbf24"/>
-    <rect x="200" y="98" width="9" height="9" rx="1.5" fill="#c7d2fe"/>
+    <rect x="200" y="98" width="9" height="9" rx="1.5" fill="#bbf7d0"/>
   </g>
   <path d="M0 120c20 0 20 6 40 6s20-6 40-6 20 6 40 6 20-6 40-6 20 6 40 6 20-6 40-6 20 6 40 6 20-6 40-6 20 6 40 6v24H0z" fill="url(#hw)"/>
   <path d="M0 132c20 0 20 5 40 5s20-5 40-5 20 5 40 5 20-5 40-5 20 5 40 5 20-5 40-5 20 5 40 5 20-5 40-5 20 5 40 5v13H0z" fill="#0ea5e9" opacity=".6"/>
