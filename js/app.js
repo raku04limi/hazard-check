@@ -199,7 +199,7 @@ function buildCategories(nat, pdfs, floor, loc) {
     } else { it.gkey = gkey; target.items.push(it); }
     target.city = true;
   }
-  for (const c of Object.values(cats)) for (const it of c.items) if (it.dup) it.note = (it.note ? it.note + ' / ' : '') + `隣接区の地図${it.dup}枚とも照合（最も危険度の高い結果を表示）`;
+  for (const c of Object.values(cats)) for (const it of c.items) if (it.dup) it.note = (it.note ? it.note + ' / ' : '') + `同じ場所を含む別の地図${it.dup}枚とも照合（最も危険度の高い結果を表示）`;
 
   for (const c of Object.values(cats)) {
     const lv = c.items.map((i) => i.level).filter((v) => v != null);
