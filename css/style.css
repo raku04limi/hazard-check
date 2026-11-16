@@ -223,3 +223,37 @@ details.ward[open] summary .ward-head::after { transform: rotate(-135deg); top: 
 .featgrid .icobox { width: 50px; height: 50px; border-radius: 18px; }
 .featgrid .icobox .ic { width: 28px; height: 28px; }
 .spin { border-color: var(--accent-soft); border-top-color: var(--accent); }
+
+/* ---------- PC・タブレット（横幅が広い画面） ---------- */
+@media (min-width: 900px) {
+  body { font-size: 15.5px; }
+  .top { padding-left: max(32px, calc((100vw - 1120px) / 2)); padding-right: max(32px, calc((100vw - 1120px) / 2)); border-radius: 0 0 48px 48px; }
+  .top h1 { font-size: 26px; }
+  .top .sub { font-size: 14px; }
+  .top .hero-art { width: 620px; height: auto; margin: -20px auto 0; }
+  main { max-width: 1120px; padding: 0 32px 120px; }
+  /* 入力欄と「チェックできること」を横に並べる */
+  #view-check.active { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 20px; align-items: start; }
+  #view-check > #checkForm { grid-column: 1; grid-row: 1; }
+  #view-check > #features { grid-column: 2; grid-row: 1; margin-top: -18px; position: relative; z-index: 2; }
+  #view-check > #candidates, #view-check > #result { grid-column: 1 / -1; }
+  #features[hidden] + #result, #view-check:has(#features[hidden]) #checkForm { grid-column: 1 / -1; }
+  /* 判定結果：まとめを左に固定、項目カードを右に2列 */
+  #result:not(:empty) { display: grid; grid-template-columns: 360px minmax(0, 1fr); gap: 20px; align-items: start; }
+  #result .summary { grid-row: 1 / span 50; position: sticky; top: 16px; }
+  #result .cats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 16px; align-items: start; }
+  #result > .callout, #result > p { grid-column: 2; }
+  .catgrid { grid-template-columns: repeat(3, 1fr); }
+  #mapList { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 16px; align-items: start; }
+  #view-history .card { max-width: none; }
+  #historyList { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 16px; align-items: start; }
+  #historyList > button { grid-column: 1 / -1; justify-self: start; }
+  #view-help .card { max-width: 820px; margin-left: auto; margin-right: auto; }
+  /* タブは画面上部の右にまとめる */
+  .tabs { top: 18px; bottom: auto; left: auto; right: max(32px, calc((100vw - 1120px) / 2)); width: 440px; margin: 0; z-index: 50; box-shadow: 0 6px 20px rgba(20, 90, 45, .18); }
+  .top .brand { padding-right: 470px; }
+}
+@media (min-width: 900px) and (max-width: 1100px) {
+  #result:not(:empty) { grid-template-columns: 320px minmax(0, 1fr); }
+  #result .cats { grid-template-columns: 1fr; }
+}

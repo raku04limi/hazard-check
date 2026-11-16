@@ -2,7 +2,7 @@ import { CATEGORIES, LEVELS, NATIONAL_LAYERS, evaluateNational, geocode } from '
 import { db, uid } from './db.js';
 import { icon, HERO } from './icons.js';
 import { MAP_CATEGORIES, isVisualOnly, loadIndex, framesAt, evalFrame, snippet, parseDepth, rgbHex } from './remotemaps.js';
-const VERSION = '2.3.0';
+const VERSION = '2.4.0';
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -222,6 +222,7 @@ async function renderResult(res, pdfs) {
     <div class="btns"><button type="button" id="openMap" class="ghost sm">${icon('map')}地図で見る</button><a class="filebtn ghost sm" href="${gmap}" target="_blank" rel="noopener">${icon('external')}Googleマップ</a></div>
     </div>
   </div>`;
+  html += '<div class="cats">';
   for (const c of list) {
     html += `<div class="card cat" id="cat-${c.key}"><h3><span class="t">${icobox(c.key)}${esc(c.name)}</span>${badge(c.level)}</h3>`;
     c.items.forEach((it, i) => {
@@ -237,6 +238,7 @@ async function renderResult(res, pdfs) {
     });
     html += '</div>';
   }
+  html += '</div>';
   if (!list.some((c) => c.city)) html += '<div class="callout info">' + icon('doc') + '<span>この地点の自治体ハザードマップはまだ収録していません（国のデータのみで判定）。「収録マップ」タブで収録済みのエリアを確認できます。</span></div>';
   html += '<p class="muted">判定は目安です。契約前に自治体の最新ハザードマップで必ず確認してください。</p>';
   out.innerHTML = html;

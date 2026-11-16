@@ -31,7 +31,7 @@ export function icon(name, cls = '') {
 }
 
 /** 起動画面のイラスト（街・川・雨雲） */
-export const HERO = `<svg class="hero-art" viewBox="0 0 360 150" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+export const HERO = `<svg class="hero-art" viewBox="0 0 360 150" aria-hidden="true">
   <defs>
     <linearGradient id="hw" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#7dd3fc"/><stop offset="1" stop-color="#38bdf8"/></linearGradient>
   </defs>
