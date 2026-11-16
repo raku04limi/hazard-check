@@ -9,6 +9,7 @@ export const MAP_CATEGORIES = [
   { key: 'tsunami', name: '津波' },
   { key: 'tameike', name: 'ため池' },
   { key: 'jishin', name: '地震（震度・液状化）' },
+  { key: 'jisseki', name: '過去の浸水実績' },
   { key: 'chikei', name: '地形・標高' },
   { key: 'hinan', name: '避難場所' },
 ];
@@ -73,8 +74,21 @@ function pointInPoly(x, y, poly) {
   return inside;
 }
 
-function matchLegend(rgb, legend, tol) {
+// chroma：建物の線などで暗くなった塗り色にも対応するため、明るさを除いた色味で比べる
+const chroma = (c) => { const t = c[0] + c[1] + c[2] || 1; return [c[0] / t, c[1] / t, c[2] / t]; };
+function matchLegend(rgb, legend, tol, mode) {
   let best = null, bd = Infinity;
+  if (mode === 'chroma') {
+    const sum = rgb[0] + rgb[1] + rgb[2];
+    if (sum < 240) return null;
+    const c = chroma(rgb);
+    for (const L of legend) {
+      const k = L._c || (L._c = chroma(L.rgb));
+      const d = Math.hypot(c[0] - k[0], c[1] - k[1], c[2] - k[2]);
+      if (d < bd) { bd = d; best = L; }
+    }
+    return bd <= tol ? best : null;
+  }
   for (const L of legend) {
     const d = Math.hypot(rgb[0] - L.rgb[0], rgb[1] - L.rgb[1], rgb[2] - L.rgb[2]);
     if (d < bd) { bd = d; best = L; }
@@ -104,7 +118,7 @@ export async function evalFrame(f, lat, lon, nearM = 50) {
     const i = (y * S + x) * 4;
     const k = (data[i] << 16) | (data[i + 1] << 8) | data[i + 2];
     let m = cache.get(k);
-    if (m === undefined) { m = matchLegend([data[i], data[i + 1], data[i + 2]], f.legend, tol); cache.set(k, m); }
+    if (m === undefined) { m = matchLegend([data[i], data[i + 1], data[i + 2]], f.legend, tol, f.match); cache.set(k, m); }
     return m;
   };
   // 地点：半径4px の多数決（文字や線を避ける）

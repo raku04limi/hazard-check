@@ -55,7 +55,7 @@ for fr in cfg['frames']:
     index['frames'].append({
         'id': f"{ward_key}-{fr['id']}", 'ward': ward_key, 'page': f"{ward_key}-{fr['page']}",
         'name': pg['title'], 'label': fr.get('label', ''), 'category': fr.get('category', pg['category']),
-        'legend': legends.get(fr.get('legend', ''), []), 'tolerance': fr.get('tolerance', 24),
+        'legend': legends.get(fr.get('legend', ''), []), 'tolerance': fr.get('tolerance', 24), **({'match': fr['match']} if fr.get('match') else {}),
         'points': pts, 'area': [[round(x, 1), round(y, 1)] for x, y in poly],
         'bbox': [min(lons), min(lats), max(lons), max(lats)],
         'accuracy_m': round(g.get('stats', {}).get('resid_m', 0), 1),

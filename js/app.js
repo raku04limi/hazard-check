@@ -2,7 +2,7 @@ import { CATEGORIES, LEVELS, NATIONAL_LAYERS, evaluateNational, geocode } from '
 import { db, uid } from './db.js';
 import { icon, HERO } from './icons.js';
 import { MAP_CATEGORIES, isVisualOnly, loadIndex, framesAt, evalFrame, snippet, parseDepth, rgbHex } from './remotemaps.js';
-const VERSION = '2.4.0';
+const VERSION = '2.5.0';
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -10,7 +10,7 @@ const lvClass = (n) => (n == null ? 'lvn' : 'lv' + n);
 const lvLabel = (n) => (n == null ? '不明' : LEVELS[n].short);
 const CAT_COLOR = {
   flood: ['#e0f2fe', '#0284c7'], naisui: ['#e0e7ff', '#4f46e5'], dosha: ['#fef3c7', '#b45309'], takashio: ['#ccfbf1', '#0d9488'],
-  tsunami: ['#dbeafe', '#2563eb'], tameike: ['#cffafe', '#0891b2'], jishin: ['#fce7f3', '#db2777'], chikei: ['#dcfce7', '#16a34a'], hinan: ['#ede9fe', '#7c3aed'],
+  tsunami: ['#dbeafe', '#2563eb'], tameike: ['#cffafe', '#0891b2'], jishin: ['#fce7f3', '#db2777'], jisseki: ['#e0f2fe', '#0369a1'], chikei: ['#dcfce7', '#16a34a'], hinan: ['#ede9fe', '#7c3aed'],
 };
 const icobox = (k) => { const [bg, fg] = CAT_COLOR[k] || ['#ede9fe', '#7c3aed']; return `<span class="icobox" style="background:${bg};color:${fg}">${icon(k)}</span>`; };
 const badge = (n) => `<span class="badge ${lvClass(n)}">${lvLabel(n)}</span>`;
@@ -171,9 +171,23 @@ function buildCategories(nat, pdfs, floor, loc) {
       it = { src: 'pdf', name: nm, level: 0, text: '色の塗られた区域の外', snip: { m, r, meters: 400 }, note: '文字や線の上で判定できなかった可能性もあるので、下の図でも確認してください' };
     }
     if (r.near) it.near = `周辺${r.nearM}m以内に「${r.near.label}」`;
-    if (m.label === '震度') {
+    if ((m.label || '').startsWith('震度')) {
       it.regional = true;
       it.note = (it.note ? it.note + ' / ' : '') + '震度は市内の広い範囲で同程度の想定のため、総合評価には含めていません';
+    }
+    if (m.category === 'jisseki') {
+      // 過去の浸水実績は、浸水したことのある豪雨をまとめて1件にする
+      const j = target.items.find((x) => x.gkey === 'jisseki') || (target.items.push({ src: 'pdf', name: '浸水実績図（' + m.name.replace(/^浸水実績図\s*\S+\s*/, '').replace(/（.*$/, '') + '）', gkey: 'jisseki', level: 0, events: [], total: 0, snip: null }), target.items[target.items.length - 1]);
+      j.total++;
+      const ev = m.name.replace(/^浸水実績図\s*/, '').replace(/（[^（]*）$/, '');
+      if (r.here) { j.events.push(ev); j.level = 2; j.snip = j.snip || it.snip; j.color = it.color; }
+      else if (r.near) j.nearEv = (j.nearEv || []).concat(ev);
+      j.name = `浸水実績図（過去${j.total}回の豪雨）`;
+      j.text = j.events.length ? `${j.events.join('、')}で浸水` : '記録された浸水なし';
+      j.near = !j.events.length && j.nearEv ? `周辺50m以内で浸水実績あり（${j.nearEv.join('、')}）` : '';
+      if (!j.events.length) j.snip = j.snip || it.snip;
+      target.city = true;
+      continue;
     }
     it = floorAdjust(it, floor);
     // 区の境目では隣の区の地図も重なるので、同じ種類の地図は危険度が最も高い1件にまとめる

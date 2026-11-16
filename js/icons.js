@@ -9,6 +9,7 @@ const P = {
   jishin: '<path d="M5 11.5 12 6l7 5.5V20H5z"/><path d="m12 9.5-1.4 3.3 2.6 1.4-1.5 3.6"/><path d="M1.8 9.5v6"/><path d="M22.2 9.5v6"/>',
   chikei: '<path d="M2.5 19h19"/><path d="M2.5 19 8 9.5l3.6 5.6L14.5 11l7 8"/><path d="M6 13.5c1.3.8 2.6.8 4 0"/><circle cx="17.5" cy="5.5" r="2"/>',
   hinan: '<path d="M4 20.5V10l8-5.5 8 5.5v10.5"/><path d="M9.5 20.5v-5.5h5v5.5"/><path d="M12 4.5V2"/><path d="M12 2h4l-1 1.2 1 1.2h-4"/>',
+  jisseki: '<path d="M4 4.5h11l4 4V20H4z"/><path d="M8 9.5h6"/><path d="M3 16.5c1.5 0 1.5 1 3 1s1.5-1 3-1 1.5 1 3 1 1.5-1 3-1 1.5 1 3 1 1.5-1 3-1"/>',
   home: '<path d="M3.5 11 12 4l8.5 7"/><path d="M5.5 9.5v10h13v-10"/><circle cx="12" cy="14" r="2.3"/><path d="m13.7 15.7 2 2"/>',
   maps: '<path d="M9 4.5 3.5 6.5v13L9 17.5l6 2 5.5-2v-13L15 6.5z"/><path d="M9 4.5v13"/><path d="M15 6.5v13"/>',
   history: '<path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1"/><path d="M3 3.5v4h4"/><path d="M12 7.5V12l3 2"/>',

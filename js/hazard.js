@@ -12,6 +12,7 @@ export const CATEGORIES = [
   { key: 'tsunami', name: '津波' },
   { key: 'tameike', name: 'ため池', pdfOnly: true },
   { key: 'jishin', name: '地震（震度・液状化）', pdfOnly: true },
+  { key: 'jisseki', name: '過去の浸水実績', pdfOnly: true },
   { key: 'chikei', name: '地形・標高' },
   { key: 'hinan', name: '避難場所' },
 ];
