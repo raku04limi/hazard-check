@@ -5,18 +5,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>物件ハザードチェック</title>
 <meta name="description" content="賃貸物件の住所から、洪水・内水・土砂・高潮・津波・地形・避難場所をまとめて確認">
-<meta name="theme-color" content="#1f5fa8">
+<meta name="theme-color" content="#7c6cff">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="ハザードチェック">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&display=swap">
 <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-<header class="top">
-  <h1>物件ハザードチェック</h1>
+<header class="top" id="top">
+  <div class="brand">
+    <div class="logo"><span data-icon="home"></span></div>
+    <div><h1>物件ハザードチェック</h1><p class="sub">住所を入れるだけで、災害リスクをまるごと確認</p></div>
+  </div>
+  <div id="heroArt"></div>
 </header>
 
 <main>
@@ -35,11 +42,20 @@
         </label>
       </div>
       <div class="btns">
-        <button type="submit" class="primary">判定する</button>
-        <button type="button" id="pickOnMap" class="ghost">地図で場所を指定</button>
+        <button type="submit" class="primary"><span data-icon="search"></span>判定する</button>
+        <button type="button" id="pickOnMap" class="ghost"><span data-icon="pin"></span>地図で指定</button>
       </div>
     </form>
     <div id="candidates"></div>
+    <div id="features" class="card feat">
+      <h3>チェックできること</h3>
+      <div class="featgrid">
+        <div><span data-ico="flood"></span>洪水</div><div><span data-ico="naisui"></span>内水</div><div><span data-ico="dosha"></span>土砂災害</div>
+        <div><span data-ico="takashio"></span>高潮</div><div><span data-ico="tsunami"></span>津波</div><div><span data-ico="tameike"></span>ため池</div>
+        <div><span data-ico="jishin"></span>地震・液状化</div><div><span data-ico="chikei"></span>地形・標高</div><div><span data-ico="hinan"></span>避難場所</div>
+      </div>
+      <p class="muted">国のハザードマップに加えて、名古屋市16区の区別ハザードマップでも照合します。</p>
+    </div>
     <div id="result"></div>
   </section>
 
@@ -85,16 +101,16 @@
 </main>
 
 <nav class="tabs">
-  <button data-view="check" class="active"><span>🏠</span>物件チェック</button>
-  <button data-view="maps"><span>🗂️</span>収録マップ</button>
-  <button data-view="history"><span>🕘</span>履歴</button>
-  <button data-view="help"><span>❔</span>使い方</button>
+  <button data-view="check" class="active"><span data-icon="home"></span>チェック</button>
+  <button data-view="maps"><span data-icon="maps"></span>収録マップ</button>
+  <button data-view="history"><span data-icon="history"></span>履歴</button>
+  <button data-view="help"><span data-icon="help"></span>使い方</button>
 </nav>
 
 <!-- 地図表示・地点指定 -->
 <div id="mapView" class="overlay full" hidden>
   <div class="ed-head">
-    <button type="button" class="back" id="mvClose">‹ 戻る</button>
+    <button type="button" class="back" id="mvClose"><span data-icon="back"></span>戻る</button>
     <select id="mvLayer"></select>
   </div>
   <div id="mvHint" class="hint" hidden></div>

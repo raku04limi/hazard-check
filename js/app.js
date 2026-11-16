@@ -1,12 +1,18 @@
 import { CATEGORIES, LEVELS, NATIONAL_LAYERS, evaluateNational, geocode } from './hazard.js';
 import { db, uid } from './db.js';
+import { icon, HERO } from './icons.js';
 import { MAP_CATEGORIES, isVisualOnly, loadIndex, framesAt, evalFrame, snippet, parseDepth, rgbHex } from './remotemaps.js';
-const VERSION = '2.1.0';
+const VERSION = '2.2.0';
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const lvClass = (n) => (n == null ? 'lvn' : 'lv' + n);
 const lvLabel = (n) => (n == null ? '不明' : LEVELS[n].short);
+const CAT_COLOR = {
+  flood: ['#e0f2fe', '#0284c7'], naisui: ['#e0e7ff', '#4f46e5'], dosha: ['#fef3c7', '#b45309'], takashio: ['#ccfbf1', '#0d9488'],
+  tsunami: ['#dbeafe', '#2563eb'], tameike: ['#cffafe', '#0891b2'], jishin: ['#fce7f3', '#db2777'], chikei: ['#dcfce7', '#16a34a'], hinan: ['#ede9fe', '#7c3aed'],
+};
+const icobox = (k) => { const [bg, fg] = CAT_COLOR[k] || ['#ede9fe', '#7c3aed']; return `<span class="icobox" style="background:${bg};color:${fg}">${icon(k)}</span>`; };
 const badge = (n) => `<span class="badge ${lvClass(n)}">${lvLabel(n)}</span>`;
 const fmtDist = (m) => (m < 1000 ? Math.round(m) + 'm' : (m / 1000).toFixed(1) + 'km');
 const catName = (k) => (MAP_CATEGORIES.find((c) => c.key === k) || {}).name || k;
@@ -29,6 +35,7 @@ function toast(msg, ms = 2600) {
 function showView(name) {
   $$('.tabs button').forEach((b) => b.classList.toggle('active', b.dataset.view === name));
   $$('.view').forEach((v) => v.classList.toggle('active', v.id === 'view-' + name));
+  $('#top').classList.toggle('compact', name !== 'check');
   if (name === 'maps') renderMapList();
   if (name === 'history') renderHistory();
   window.scrollTo(0, 0);
@@ -82,6 +89,7 @@ async function runCheck(loc, opts = {}) {
   const out = $('#result');
   const total = NATIONAL_LAYERS.length;
   let done = 0;
+  $('#features').hidden = true;
   out.innerHTML = `<div class="card loading"><div class="spin"></div><span id="prog">判定中…</span></div>`;
   const prog = () => { const p = $('#prog'); if (p) p.textContent = `判定中… 国のデータ ${done}/${total}`; };
 
@@ -200,32 +208,36 @@ async function renderResult(res, pdfs) {
   const list = Object.values(cats);
   const high = list.filter((c) => c.levelOverall >= 3 && c.key !== 'hinan');
   const gmap = `https://www.google.com/maps/search/?api=1&query=${loc.lat},${loc.lon}`;
+  const lvBig = overall == null ? '不明' : LEVELS[overall].label;
   let html = `<div class="card summary b-${lvClass(overall)}">
-    <div class="big">総合 ${badge(overall)}</div>
-    <div style="margin-top:6px"><b>${esc(loc.title || loc.query || '指定地点')}</b>${memo ? ' <span class="muted">' + esc(memo) + '</span>' : ''}</div>
-    <div class="muted">${floor}階の部屋として判定 / ${loc.lat.toFixed(5)}, ${loc.lon.toFixed(5)}</div>
-    ${overall == null ? '<p class="warn">データを取得できませんでした。通信状態を確認して、もう一度判定してください。</p>'
-      : high.length ? `<p class="warn">要確認：${high.map((c) => esc(c.name) + '（' + esc(worstText(c)) + '）').join('、')}</p>` : '<p class="note">大きなリスクは見つかりませんでした。</p>'}
+    <div class="sum-head">
+      <div class="score"><div><small>総合</small><b>${lvLabel(overall)}</b></div></div>
+      <div class="sum-title"><b>${esc(loc.title || loc.query || '指定地点')}</b><span>${memo ? esc(memo) + ' ・ ' : ''}${floor}階の部屋として判定</span></div>
+    </div>
+    <div class="sum-body">
+    ${overall == null ? `<div class="callout warn">${icon('warn')}<span>データを取得できませんでした。通信状態を確認して、もう一度判定してください。</span></div>`
+      : high.length ? `<div class="callout warn">${icon('warn')}<span>要確認：${high.map((c) => esc(c.name) + '（' + esc(worstText(c)) + '）').join('、')}</span></div>` : `<div class="callout ok">${icon('check')}<span>大きなリスクは見つかりませんでした（総合：${lvBig}）</span></div>`}
     ${overall != null && list.some((c) => c.level == null) ? '<p class="note">「不明」の項目は、データが取れなかったか未整備です。下の詳細を確認してください。</p>' : ''}
-    <div class="catgrid">${list.map((c) => `<a href="#cat-${c.key}" class="catchip ${lvClass(c.level)}"><span>${c.icon} ${esc(c.name)}</span><b>${lvLabel(c.level)}</b></a>`).join('')}</div>
-    <div class="btns"><button type="button" id="openMap" class="ghost sm">地図で見る</button><a class="filebtn ghost sm" style="font-size:13px;padding:6px 10px" href="${gmap}" target="_blank" rel="noopener">Googleマップ</a></div>
+    <div class="catgrid">${list.map((c) => `<a href="#cat-${c.key}" class="catchip ${lvClass(c.level)}">${icon(c.key)}<span>${esc(c.name.replace(/（.*）/, ''))}</span><b>${lvLabel(c.level)}</b></a>`).join('')}</div>
+    <div class="btns"><button type="button" id="openMap" class="ghost sm">${icon('map')}地図で見る</button><a class="filebtn ghost sm" href="${gmap}" target="_blank" rel="noopener">${icon('external')}Googleマップ</a></div>
+    </div>
   </div>`;
   for (const c of list) {
-    html += `<div class="card cat" id="cat-${c.key}"><h3><span>${c.icon} ${esc(c.name)}</span>${badge(c.level)}</h3>`;
+    html += `<div class="card cat" id="cat-${c.key}"><h3><span class="t">${icobox(c.key)}${esc(c.name)}</span>${badge(c.level)}</h3>`;
     c.items.forEach((it, i) => {
       html += `<div class="item">
         <div class="ihead"><span class="iname"><span class="src ${it.src}">${it.src === 'gov' ? '国' : '市'}</span>${esc(it.name)}</span>${it.visual ? '' : badge(it.level)}</div>
         <div class="itext">${it.color ? `<span class="swatch" style="background:${it.color}"></span>` : ''}${esc(it.text)}</div>
-        ${it.near ? `<div class="warn">⚠ ${esc(it.near)}</div>` : ''}
+        ${it.near ? `<div class="warn">${icon('warn')}${esc(it.near)}</div>` : ''}
         ${it.note ? `<div class="note">${esc(it.note)}</div>` : ''}
         ${it.shelters && it.shelters.length > 1 ? `<div class="note">ほか：${it.shelters.slice(1).map((s) => esc(s.name) + '（' + fmtDist(s.dist) + '）').join('、')}</div>` : ''}
-        ${it.shelters && it.shelters[0] ? `<div class="shelter"><a href="https://www.google.com/maps/dir/?api=1&origin=${loc.lat},${loc.lon}&destination=${it.shelters[0].lat},${it.shelters[0].lon}&travelmode=walking" target="_blank" rel="noopener">徒歩ルートを見る</a></div>` : ''}
+        ${it.shelters && it.shelters[0] ? `<div class="shelter"><a href="https://www.google.com/maps/dir/?api=1&origin=${loc.lat},${loc.lon}&destination=${it.shelters[0].lat},${it.shelters[0].lon}&travelmode=walking" target="_blank" rel="noopener" class="filebtn ghost sm">${icon('route')}徒歩ルートを見る</a></div>` : ''}
         ${it.snip ? `<div class="snip" data-snip="${c.key}:${i}"></div>` : ''}
       </div>`;
     });
     html += '</div>';
   }
-  if (!list.some((c) => c.city)) html += '<div class="card note">この地点の自治体ハザードマップはまだ収録していません（国のデータのみで判定）。「収録マップ」タブで収録済みのエリアを確認できます。</div>';
+  if (!list.some((c) => c.city)) html += '<div class="callout info">' + icon('doc') + '<span>この地点の自治体ハザードマップはまだ収録していません（国のデータのみで判定）。「収録マップ」タブで収録済みのエリアを確認できます。</span></div>';
   html += '<p class="muted">判定は目安です。契約前に自治体の最新ハザードマップで必ず確認してください。</p>';
   out.innerHTML = html;
   $('#openMap').addEventListener('click', () => openMapView({ mode: 'view', loc, shelters: res.nat.shel }));
@@ -252,13 +264,13 @@ async function saveHistory(res) {
 async function renderHistory() {
   const list = (await db.all('history')).sort((a, b) => b.date - a.date);
   const el = $('#historyList');
-  if (!list.length) { el.innerHTML = '<div class="card muted">まだ判定履歴はありません。</div>'; return; }
+  if (!list.length) { el.innerHTML = `<div class="card empty">${icon('history')}<div>まだ判定履歴はありません。<br>物件をチェックすると、ここに保存されます。</div></div>`; return; }
   el.innerHTML = list.map((h) => `<div class="card">
-    <div class="ihead" style="display:flex;justify-content:space-between;gap:8px"><b>${esc(h.title)}</b>${badge(h.overall)}</div>
+    <div class="hist-head"><b>${esc(h.title)}</b>${badge(h.overall)}</div>
     <div class="muted">${new Date(h.date).toLocaleString('ja-JP')} / ${h.floor}階${h.memo ? ' / ' + esc(h.memo) : ''}</div>
-    <div class="catgrid">${Object.values(h.cats).map((c) => `<span class="catchip ${lvClass(c.level)}"><span>${esc(c.name)}</span><b>${lvLabel(c.level)}</b></span>`).join('')}</div>
-    <div class="btns"><button class="ghost sm" data-re="${h.id}">もう一度判定</button><button class="ghost sm" data-del="${h.id}">削除</button></div>
-  </div>`).join('') + '<button class="ghost sm" id="histClear">履歴をすべて削除</button>';
+    <div class="catgrid">${Object.values(h.cats).map((c) => `<span class="catchip ${lvClass(c.level)}"><span>${esc(c.name.replace(/（.*）/, ''))}</span><b>${lvLabel(c.level)}</b></span>`).join('')}</div>
+    <div class="btns"><button class="ghost sm" data-re="${h.id}">${icon('redo')}もう一度判定</button><button class="ghost sm" data-del="${h.id}">${icon('trash')}削除</button></div>
+  </div>`).join('') + '<button class="danger sm" id="histClear">履歴をすべて削除</button>';
   $$('[data-re]', el).forEach((b) => b.addEventListener('click', () => {
     const h = list.find((x) => x.id === b.dataset.re);
     showView('check');
@@ -327,31 +339,37 @@ function openMapView({ mode, loc, shelters }) {
 }
 
 // ---------------- 収録マップ ----------------
-const CAT_ICON = Object.fromEntries(CATEGORIES.map((c) => [c.key, c.icon]));
 async function renderMapList() {
   const idx = await loadIndex();
   const el = $('#mapList');
-  const wards = Object.entries(idx.wards || {});
-  if (!wards.length) { el.innerHTML = '<div class="card muted">まだ収録したマップはありません。</div>'; return; }
+  const ORDER = ['chikusa', 'higashi', 'kita', 'nishi', 'nakamura', 'naka', 'showa', 'mizuho', 'atsuta', 'nakagawa', 'minato', 'minami', 'moriyama', 'midori', 'meito', 'tenpaku'];
+  const rank = (k) => { const i = ORDER.indexOf(k.replace('nagoya-', '')); return i < 0 ? 99 : i; };
+  const wards = Object.entries(idx.wards || {}).sort((x, y) => rank(x[0]) - rank(y[0]) || x[1].name.localeCompare(y[1].name, 'ja'));
+  if (!wards.length) { el.innerHTML = `<div class="card empty">${icon('maps')}<div>まだ収録したマップはありません。</div></div>`; return; }
   el.innerHTML = wards.map(([key, w]) => {
     const fr = idx.frames.filter((f) => f.ward === key);
     const pages = [...new Set(fr.map((f) => f.page))];
-    return `<div class="card">
-      <h3>${esc(w.name)}</h3>
-      <p class="muted">出典：<a href="${esc(w.source)}" target="_blank" rel="noopener">${esc(w.name)}のハザードマップ（自治体の公式サイト）</a></p>
+    const cats = [...new Set(fr.map((f) => f.category))];
+    return `<details class="card ward">
+      <summary><div class="ward-head">${icobox('chikei')}<div><h3>${esc(w.name)}</h3><span class="muted">地図 ${fr.length}枚</span></div></div>
+        <div class="tags">${cats.map((c) => `<span class="tag">${icon(c)}${esc(catName(c).replace(/（.*）/, ''))}</span>`).join('')}</div></summary>
+      <p class="muted">出典：<a href="${esc(w.source)}" target="_blank" rel="noopener">${esc(w.name)}のハザードマップ（公式サイト）</a></p>
       ${pages.map((pid) => {
         const pg = idx.pages[pid];
         const fs = fr.filter((f) => f.page === pid);
         return `<div class="item"><div class="itext"><a href="${esc(pg.source)}" target="_blank" rel="noopener">${esc(pg.title)}</a></div>
-          <div class="note">${fs.map((f) => `${CAT_ICON[f.category] || '📄'} ${esc(f.label || catName(f.category))}${f.legend.length ? '' : '（目視用）'}`).join(' ・ ')}</div>
+          <div class="note">${fs.map((f) => `${esc(f.label || catName(f.category))}${f.legend.length ? '' : '（目視用）'}`).join(' ・ ')}</div>
           <div class="note">位置のずれ：約${Math.max(...fs.map((f) => f.accuracy_m || 0)).toFixed(0)}m（地理院地図と照合）</div></div>`;
       }).join('')}
-    </div>`;
+    </details>`;
   }).join('');
 }
 
 // ---------------- 起動 ----------------
 $('#ver').textContent = 'バージョン ' + VERSION;
+$('#heroArt').innerHTML = HERO;
+$$('[data-icon]').forEach((el) => { el.outerHTML = icon(el.dataset.icon); });
+$$('[data-ico]').forEach((el) => { el.outerHTML = icobox(el.dataset.ico); });
 loadIndex();
 if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
 
