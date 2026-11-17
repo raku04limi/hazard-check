@@ -2,7 +2,7 @@ import { CATEGORIES, LEVELS, NATIONAL_LAYERS, evaluateNational, geocode } from '
 import { db, uid } from './db.js';
 import { icon, HERO } from './icons.js';
 import { MAP_CATEGORIES, isVisualOnly, loadIndex, framesAt, evalFrame, snippet, parseDepth, rgbHex } from './remotemaps.js';
-const VERSION = '2.6.0';
+const VERSION = '2.7.0';
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -130,9 +130,11 @@ function buildCategories(nat, pdfs, floor, loc) {
   }
 
   // 自治体のWeb版ハザードマップ（収録データ）
+  // 稲沢市Web版のデータは、稲沢市の洪水マップの範囲内の地点だけに使う
+  const inInazawa = pdfs.some(({ m, r }) => m.ward === 'inazawa' && m.category === 'flood' && r.covered);
   for (const r of nat.local || []) {
     const L = r.layer;
-    if (r.error) continue;
+    if (r.error || !inInazawa) continue;
     let it;
     if (r.here) it = { src: 'pdf', name: L.name, level: r.here.level, text: r.here.label, color: r.here.color, depth: r.here.depth };
     else it = { src: 'pdf', name: L.name, level: 0, text: '区域外' };
@@ -182,6 +184,7 @@ function buildCategories(nat, pdfs, floor, loc) {
     } else {
       it = { src: 'pdf', name: nm, level: 0, text: '色の塗られた区域の外', snip: { m, r, meters: 400 }, note: '文字や線の上で判定できなかった可能性もあるので、下の図でも確認してください' };
     }
+    if (r.aroundMark) it.note = (it.note ? it.note + ' / ' : '') + '地点が地図の記号や文字に重なるため、すぐ周りの色で判定';
     if (r.near) it.near = `周辺${r.nearM}m以内に「${r.near.label}」`;
     if ((m.label || '').startsWith('震度')) {
       it.regional = true;

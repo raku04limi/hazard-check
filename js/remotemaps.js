@@ -130,6 +130,20 @@ export async function evalFrame(f, lat, lon, nearM = 50) {
   let here = null, hv = 0;
   for (const [m, v] of votes) if (v > hv || (v === hv && m.level > here.level)) { here = m; hv = v; }
   if (here && hv < 6) here = null;
+  // 地点が記号や文字の上で読めないときは、すぐ周り（半径20px）で最も多い色を使う
+  let aroundMark = false;
+  if (!here) {
+    const v2 = new Map(); let tot = 0;
+    for (let dy = -20; dy <= 20; dy++) for (let dx = -20; dx <= 20; dx++) {
+      if (dx * dx + dy * dy > 400 || R + dx < 0 || R + dy < 0 || R + dx >= S || R + dy >= S) continue;
+      tot++;
+      const m = at(R + dx, R + dy);
+      if (m) v2.set(m, (v2.get(m) || 0) + 1);
+    }
+    let bm = null, bv = 0;
+    for (const [m, v] of v2) if (v > bv) { bm = m; bv = v; }
+    if (bm && bv >= tot * 0.15) { here = bm; aroundMark = true; }
+  }
   // 周辺（範囲内の画素だけ）
   const cnt = new Map();
   for (let y = 0; y < S; y += 2) for (let x = 0; x < S; x += 2) {
@@ -141,6 +155,7 @@ export async function evalFrame(f, lat, lon, nearM = 50) {
   let near = null;
   for (const [m, v] of cnt) if (v >= 8 && (!near || m.level > near.level)) near = m;
   res.here = here;
+  res.aroundMark = aroundMark;
   res.near = near && (!here || near.level > here.level) ? near : null;
   res.nearM = nearM;
   return res;
