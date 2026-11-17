@@ -81,6 +81,8 @@ function matchLegend(rgb, legend, tol, mode) {
   if (mode === 'chroma') {
     const sum = rgb[0] + rgb[1] + rgb[2];
     if (sum < 240) return null;
+    // 色味のほとんどない画素（地図の灰色の陰影や白地）は判定しない
+    if (Math.max(rgb[0], rgb[1], rgb[2]) - Math.min(rgb[0], rgb[1], rgb[2]) < 20) return null;
     const c = chroma(rgb);
     for (const L of legend) {
       const k = L._c || (L._c = chroma(L.rgb));

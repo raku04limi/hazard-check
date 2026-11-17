@@ -1,0 +1,570 @@
+{
+ "key": "kasugai",
+ "ward": "愛知県春日井市",
+ "dpi": 160.6,
+ "center": [
+  136.98,
+  35.26
+ ],
+ "search_px": 2200,
+ "source": "https://www.city.kasugai.lg.jp/",
+ "pages": {
+  "seibu": {
+   "title": "洪水ハザードマップ 西部地区版（春日井市）",
+   "category": "flood",
+   "source": "https://www.city.kasugai.lg.jp/"
+  },
+  "chubu": {
+   "title": "洪水ハザードマップ 中部地区版（春日井市）",
+   "category": "flood",
+   "source": "https://www.city.kasugai.lg.jp/"
+  },
+  "toubu": {
+   "title": "洪水ハザードマップ 東部地区版（春日井市）",
+   "category": "flood",
+   "source": "https://www.city.kasugai.lg.jp/"
+  },
+  "bk1": {
+   "title": "雨水出水浸水想定区域図 想定最大規模 1/4（春日井市）",
+   "category": "naisui",
+   "source": "https://www.city.kasugai.lg.jp/"
+  },
+  "bk2": {
+   "title": "雨水出水浸水想定区域図 想定最大規模 2/4（春日井市）",
+   "category": "naisui",
+   "source": "https://www.city.kasugai.lg.jp/"
+  },
+  "bk3": {
+   "title": "雨水出水浸水想定区域図 想定最大規模 3/4（春日井市）",
+   "category": "naisui",
+   "source": "https://www.city.kasugai.lg.jp/"
+  },
+  "bk4": {
+   "title": "雨水出水浸水想定区域図 想定最大規模 4/4（春日井市）",
+   "category": "naisui",
+   "source": "https://www.city.kasugai.lg.jp/"
+  },
+  "jishin": {
+   "title": "地震防災マップ 南海トラフ地震 理論上最大想定（春日井市）",
+   "category": "jishin",
+   "source": "https://www.city.kasugai.lg.jp/"
+  },
+  "jishin_ura": {
+   "title": "地震防災マップ 春日井市直下の地震（春日井市）",
+   "category": "jishin",
+   "source": "https://www.city.kasugai.lg.jp/"
+  }
+ },
+ "frames": [
+  {
+   "id": "seibu-sho",
+   "page": "seibu",
+   "label": "庄内川",
+   "scale": [
+    18000,
+    19000,
+    20000,
+    21000,
+    22000
+   ],
+   "legend": "kasu_flood",
+   "match": "chroma",
+   "tolerance": 0.03,
+   "poly": [
+    [
+     27,
+     13
+    ],
+    [
+     61,
+     9
+    ],
+    [
+     61,
+     66
+    ],
+    [
+     56,
+     66
+    ],
+    [
+     56,
+     77
+    ],
+    [
+     27,
+     77
+    ]
+   ]
+  },
+  {
+   "id": "seibu-oth",
+   "page": "seibu",
+   "label": "その他の河川",
+   "scale": [
+    18000,
+    19000,
+    20000,
+    21000,
+    22000
+   ],
+   "legend": "kasu_flood",
+   "match": "chroma",
+   "tolerance": 0.03,
+   "poly": [
+    [
+     64,
+     13
+    ],
+    [
+     98,
+     9
+    ],
+    [
+     98,
+     66
+    ],
+    [
+     93,
+     66
+    ],
+    [
+     93,
+     77
+    ],
+    [
+     64,
+     77
+    ]
+   ]
+  },
+  {
+   "id": "chubu-sho",
+   "page": "chubu",
+   "label": "庄内川",
+   "scale": [
+    18000,
+    19000,
+    20000,
+    21000,
+    22000
+   ],
+   "legend": "kasu_flood",
+   "match": "chroma",
+   "tolerance": 0.03,
+   "poly": [
+    [
+     27,
+     13
+    ],
+    [
+     61,
+     9
+    ],
+    [
+     61,
+     66
+    ],
+    [
+     56,
+     66
+    ],
+    [
+     56,
+     77
+    ],
+    [
+     27,
+     77
+    ]
+   ]
+  },
+  {
+   "id": "chubu-oth",
+   "page": "chubu",
+   "label": "その他の河川",
+   "scale": [
+    18000,
+    19000,
+    20000,
+    21000,
+    22000
+   ],
+   "legend": "kasu_flood",
+   "match": "chroma",
+   "tolerance": 0.03,
+   "poly": [
+    [
+     64,
+     13
+    ],
+    [
+     98,
+     9
+    ],
+    [
+     98,
+     66
+    ],
+    [
+     93,
+     66
+    ],
+    [
+     93,
+     77
+    ],
+    [
+     64,
+     77
+    ]
+   ]
+  },
+  {
+   "id": "toubu-sho",
+   "page": "toubu",
+   "label": "庄内川",
+   "scale": [
+    18000,
+    19000,
+    20000,
+    21000,
+    22000
+   ],
+   "legend": "kasu_flood",
+   "match": "chroma",
+   "tolerance": 0.03,
+   "poly": [
+    [
+     27,
+     13
+    ],
+    [
+     61,
+     9
+    ],
+    [
+     61,
+     66
+    ],
+    [
+     56,
+     66
+    ],
+    [
+     56,
+     77
+    ],
+    [
+     27,
+     77
+    ]
+   ]
+  },
+  {
+   "id": "toubu-oth",
+   "page": "toubu",
+   "label": "その他の河川",
+   "scale": [
+    18000,
+    19000,
+    20000,
+    21000,
+    22000
+   ],
+   "legend": "kasu_flood",
+   "match": "chroma",
+   "tolerance": 0.03,
+   "poly": [
+    [
+     64,
+     13
+    ],
+    [
+     98,
+     9
+    ],
+    [
+     98,
+     66
+    ],
+    [
+     93,
+     66
+    ],
+    [
+     93,
+     77
+    ],
+    [
+     64,
+     77
+    ]
+   ]
+  },
+  {
+   "id": "bk1",
+   "page": "bk1",
+   "label": "",
+   "scale": [
+    23000,
+    24000,
+    25000
+   ],
+   "legend": "kasu_naisui",
+   "tolerance": 14,
+   "poly": [
+    [
+     3,
+     6
+    ],
+    [
+     97,
+     6
+    ],
+    [
+     97,
+     72
+    ],
+    [
+     3,
+     72
+    ]
+   ]
+  },
+  {
+   "id": "bk2",
+   "page": "bk2",
+   "label": "",
+   "scale": [
+    23000,
+    24000,
+    25000
+   ],
+   "legend": "kasu_naisui",
+   "tolerance": 14,
+   "poly": [
+    [
+     27,
+     9
+    ],
+    [
+     97,
+     9
+    ],
+    [
+     97,
+     96
+    ],
+    [
+     13,
+     96
+    ],
+    [
+     13,
+     79
+    ],
+    [
+     3,
+     79
+    ],
+    [
+     3,
+     63
+    ],
+    [
+     27,
+     63
+    ]
+   ]
+  },
+  {
+   "id": "bk3",
+   "page": "bk3",
+   "label": "",
+   "scale": [
+    23000,
+    24000,
+    25000
+   ],
+   "legend": "kasu_naisui",
+   "tolerance": 14,
+   "poly": [
+    [
+     3,
+     6
+    ],
+    [
+     97,
+     6
+    ],
+    [
+     97,
+     72
+    ],
+    [
+     30,
+     72
+    ],
+    [
+     30,
+     97
+    ],
+    [
+     3,
+     97
+    ]
+   ]
+  },
+  {
+   "id": "bk4",
+   "page": "bk4",
+   "label": "",
+   "scale": [
+    23000,
+    24000,
+    25000
+   ],
+   "legend": "kasu_naisui",
+   "tolerance": 14,
+   "poly": [
+    [
+     3,
+     9
+    ],
+    [
+     72,
+     9
+    ],
+    [
+     72,
+     60
+    ],
+    [
+     97,
+     60
+    ],
+    [
+     97,
+     84
+    ],
+    [
+     88,
+     84
+    ],
+    [
+     88,
+     97
+    ],
+    [
+     3,
+     97
+    ]
+   ]
+  },
+  {
+   "id": "jishin",
+   "page": "jishin",
+   "label": "震度（南海トラフ）",
+   "scale": [
+    27000,
+    28000,
+    29000,
+    30000,
+    31000,
+    32000
+   ],
+   "legend": "kasu_shindo1",
+   "tolerance": 30,
+   "poly": [
+    [
+     50,
+     22
+    ],
+    [
+     97,
+     9
+    ],
+    [
+     97,
+     67
+    ],
+    [
+     66,
+     67
+    ],
+    [
+     66,
+     77
+    ],
+    [
+     55,
+     77
+    ],
+    [
+     55,
+     95
+    ],
+    [
+     27,
+     95
+    ],
+    [
+     27,
+     38
+    ],
+    [
+     50,
+     38
+    ]
+   ]
+  },
+  {
+   "id": "jishin_ura",
+   "page": "jishin_ura",
+   "label": "震度（直下の地震）",
+   "scale": [
+    38000,
+    40000,
+    42000,
+    44000
+   ],
+   "legend": "kasu_shindo2",
+   "tolerance": 30,
+   "poly": [
+    [
+     23,
+     5
+    ],
+    [
+     48,
+     5
+    ],
+    [
+     48,
+     39
+    ],
+    [
+     24,
+     39
+    ],
+    [
+     24,
+     62
+    ],
+    [
+     2,
+     62
+    ],
+    [
+     2,
+     24
+    ],
+    [
+     23,
+     24
+    ]
+   ]
+  }
+ ]
+}

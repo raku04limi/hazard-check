@@ -2,7 +2,7 @@ import { CATEGORIES, LEVELS, NATIONAL_LAYERS, evaluateNational, geocode } from '
 import { db, uid } from './db.js';
 import { icon, HERO } from './icons.js';
 import { MAP_CATEGORIES, isVisualOnly, loadIndex, framesAt, evalFrame, snippet, parseDepth, rgbHex } from './remotemaps.js';
-const VERSION = '2.7.0';
+const VERSION = '2.8.0';
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
