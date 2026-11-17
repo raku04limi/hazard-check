@@ -2,7 +2,7 @@ import { CATEGORIES, LEVELS, NATIONAL_LAYERS, evaluateNational, geocode } from '
 import { db, uid } from './db.js';
 import { icon, HERO } from './icons.js';
 import { MAP_CATEGORIES, isVisualOnly, loadIndex, framesAt, evalFrame, snippet, parseDepth, rgbHex } from './remotemaps.js';
-const VERSION = '2.5.0';
+const VERSION = '2.6.0';
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -127,6 +127,18 @@ function buildCategories(nat, pdfs, floor, loc) {
     if (r.near) it.near = `周辺${r.nearM}m以内に「${r.near.label}」`;
     if (r.here && r.here.unknown) it.note = '色が凡例と一致しないため深さ不明。地図で確認してください';
     cats[L.cat].items.push(floorAdjust(it, floor));
+  }
+
+  // 自治体のWeb版ハザードマップ（収録データ）
+  for (const r of nat.local || []) {
+    const L = r.layer;
+    if (r.error) continue;
+    let it;
+    if (r.here) it = { src: 'pdf', name: L.name, level: r.here.level, text: r.here.label, color: r.here.color, depth: r.here.depth };
+    else it = { src: 'pdf', name: L.name, level: 0, text: '区域外' };
+    if (r.near) it.near = `周辺${r.nearM}m以内に「${r.near.label}」`;
+    (cats[L.cat] || cats.flood).items.push(floorAdjust(it, floor));
+    (cats[L.cat] || cats.flood).city = true;
   }
 
   // 地形・標高

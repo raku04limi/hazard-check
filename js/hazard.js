@@ -153,7 +153,7 @@ function classifyPixel(layer, rgba) {
 
 /** ラスタ層の判定（地点そのもの＋周辺 nearM m 以内の最大） */
 export async function evalRasterLayer(layer, lat, lon, nearM = 50) {
-  const z = 17;
+  const z = layer.z || 17;
   const mpp = metersPerPixel(lat, z);
   const R = Math.max(2, Math.round(nearM / mpp));
   const s = await sampleRaster(layer.url, lat, lon, z, R);
@@ -319,6 +319,39 @@ export async function geocode(q) {
 }
 
 /** 国のデータでの一括判定 */
+// 自治体のWeb版ハザードマップから収録したデータ（data/raster, data/vector）
+const INAZAWA_BBOX = [136.69, 35.17, 136.89, 35.32];
+export const LOCAL_LAYERS = [
+  { key: 'ina_kiso', cat: 'flood', name: '洪水 浸水深（木曽川・想定最大規模）／稲沢市', url: 'data/raster/inazawa_kiso/{z}/{x}/{y}.png', z: 16, type: 'depth', bbox: INAZAWA_BBOX },
+  { key: 'ina_kisoigai', cat: 'flood', name: '洪水 浸水深（日光川・新川・庄内川など）／稲沢市', url: 'data/raster/inazawa_kisoigai/{z}/{x}/{y}.png', z: 16, type: 'depth', bbox: INAZAWA_BBOX },
+];
+export const LOCAL_POLYS = [
+  { key: 'ina_hanran', cat: 'flood', name: '家屋倒壊等氾濫想定区域（木曽川・氾濫流）／稲沢市', url: 'data/vector/inazawa_kiso_hanranryu.json', level: 4, inLabel: '区域内（木造家屋が倒壊する恐れ）', bbox: INAZAWA_BBOX },
+  { key: 'ina_kiso_shin', cat: 'flood', name: '家屋倒壊等氾濫想定区域（木曽川・河岸侵食）／稲沢市', url: 'data/vector/inazawa_kiso_sinsyoku.json', level: 4, inLabel: '区域内（地盤ごと流される恐れ）', bbox: INAZAWA_BBOX },
+  { key: 'ina_shin', cat: 'flood', name: '家屋倒壊等氾濫想定区域（その他の河川・河岸侵食）／稲沢市', url: 'data/vector/inazawa_kisoigai_sinsyoku.json', level: 4, inLabel: '区域内（地盤ごと流される恐れ）', bbox: INAZAWA_BBOX },
+  { key: 'ina_jisseki', cat: 'jisseki', name: '浸水実績（平成12年9月以降）／稲沢市', url: 'data/vector/inazawa_jisseki.json', level: 2, inLabel: '過去に浸水した区域', bbox: INAZAWA_BBOX },
+];
+const inBox = (b, lat, lon) => lon >= b[0] && lon <= b[2] && lat >= b[1] && lat <= b[3];
+const polyCache = new Map();
+async function evalPolyLayer(L, lat, lon, nearM = 50) {
+  if (!polyCache.has(L.url)) polyCache.set(L.url, fetch(L.url).then((r) => r.json()));
+  const d = await polyCache.get(L.url);
+  const here = d.features.some((f) => f.geometry && pointInGeom(lon, lat, f.geometry));
+  let near = false;
+  if (!here) {
+    const dl = nearM / 111000, dn = nearM / (111000 * Math.cos((lat * Math.PI) / 180));
+    near = [[dl, 0], [-dl, 0], [0, dn], [0, -dn], [dl * .7, dn * .7], [-dl * .7, -dn * .7], [dl * .7, -dn * .7], [-dl * .7, dn * .7]]
+      .some(([a, b]) => d.features.some((f) => f.geometry && pointInGeom(lon + b, lat + a, f.geometry)));
+  }
+  return { layer: L, poly: true, here: here ? { level: L.level, label: L.inLabel } : null, near: near ? { level: L.level, label: L.inLabel } : null, nearM };
+}
+
+export async function evaluateLocal(lat, lon) {
+  const r = LOCAL_LAYERS.filter((l) => inBox(l.bbox, lat, lon)).map((l) => evalRasterLayer(l, lat, lon).catch((e) => ({ layer: l, error: String(e) })));
+  const p = LOCAL_POLYS.filter((l) => inBox(l.bbox, lat, lon)).map((l) => evalPolyLayer(l, lat, lon).catch((e) => ({ layer: l, error: String(e) })));
+  return Promise.all([...r, ...p]);
+}
+
 export async function evaluateNational(lat, lon, onProgress) {
   const tasks = NATIONAL_LAYERS.map((l) => evalRasterLayer(l, lat, lon).catch((e) => ({ layer: l, error: String(e) })));
   const [layers, elev, land, shel] = await Promise.all([
@@ -327,5 +360,6 @@ export async function evaluateNational(lat, lon, onProgress) {
     getLandform(lat, lon).catch((e) => ({ items: [], error: String(e) })),
     getShelters(lat, lon).catch((e) => ({ byType: [], error: String(e) })),
   ]);
-  return { layers, elev, land, shel };
+  const local = await evaluateLocal(lat, lon).catch(() => []);
+  return { layers, elev, land, shel, local };
 }

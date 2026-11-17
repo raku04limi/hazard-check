@@ -11,3 +11,8 @@
 6. `build_data.py <作業フォルダ> <区の設定JSON> data` でタイル画像と `data/index.json` を出力
 
 位置の精度は地理院地図との照合残差で 1〜2m 程度（`data/index.json` の `accuracy_m`）。
+
+## Web版ハザードマップからの収録（稲沢市）
+`https://www2.city.inazawa.aichi.jp/hazardmap/` の浸水深タイル（`Tile/L2_kiso_4`, `Tile/L2_kisoigai_4`、z16、国の標準凡例色）を
+16色パレットPNGに変換して `data/raster/` に、浸水実績・家屋倒壊等氾濫想定区域のGeoJSONを `data/vector/` に保存。
+アプリは `js/hazard.js` の LOCAL_LAYERS / LOCAL_POLYS で判定する。
