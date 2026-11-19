@@ -2,7 +2,7 @@ import { CATEGORIES, LEVELS, NATIONAL_LAYERS, evaluateNational, geocode } from '
 import { db, uid } from './db.js';
 import { icon, HERO } from './icons.js';
 import { MAP_CATEGORIES, isVisualOnly, loadIndex, framesAt, evalFrame, snippet, parseDepth, rgbHex } from './remotemaps.js';
-const VERSION = '2.8.0';
+const VERSION = '2.9.0';
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -99,8 +99,8 @@ async function runCheck(loc, opts = {}) {
     Promise.all(frames.map(async (m) => ({ m, r: await evalFrame(m, loc.lat, loc.lon).catch((e) => ({ covered: false, error: e.message })) }))),
   ]);
   const cats = buildCategories(nat, pdfs, floor, loc);
-  const overall = Math.max(...Object.values(cats).map((c) => (c.levelOverall == null ? -1 : c.levelOverall)));
-  lastResult = { loc, floor, memo, nat, cats, overall: overall < 0 ? null : overall };
+  const risk = riskScore(cats);
+  lastResult = { loc, floor, memo, nat, cats, overall: risk.stars, reasons: risk.reasons };
   await renderResult(lastResult, pdfs);
   if (!opts.noSave) saveHistory(lastResult);
 }
@@ -226,6 +226,48 @@ function buildCategories(nat, pdfs, floor, loc) {
   return cats;
 }
 
+// ---- 危険度（★1〜5）----
+// 「想定最大規模（1000年に1回程度）」の浸水想定は、起きたときの最悪ケースなので1段階割り引いて評価する。
+// 計画規模の想定・実際の浸水実績・土砂災害はそのまま評価。液状化・地形は広い範囲で同程度なので「注意」止まり。
+const WATER = ['flood', 'naisui', 'takashio', 'tsunami', 'tameike'];
+function adjLevel(it, cat) {
+  if (it.level == null || it.regional) return null;
+  const n = (it.name || '') + ' ' + (it.text || '');
+  if (cat === 'hinan') return null;
+  if (cat === 'jisseki') return it.level > 0 ? 3 : 0;
+  if (/液状化/.test(n)) return Math.min(it.level, 2);
+  if (cat === 'chikei') return Math.min(it.level, 2);
+  if (cat === 'jishin') return Math.min(it.level, 2);
+  if (WATER.includes(cat)) {
+    if (/計画規模|実績/.test(n)) return it.level;
+    return it.level >= 1 ? Math.max(1, it.level - 1) : 0;
+  }
+  return it.level;
+}
+const STAR_LABEL = ['', '低い', 'やや低い', '注意', '高い', '非常に高い'];
+function riskScore(cats) {
+  const per = [];
+  let any = false;
+  for (const c of Object.values(cats)) {
+    let best = null, why = null;
+    for (const it of c.items) {
+      const a = adjLevel(it, c.key);
+      if (a == null) continue;
+      any = true;
+      if (best == null || a > best) { best = a; why = it; }
+    }
+    if (best != null) per.push({ c, lv: best, why });
+  }
+  if (!any) return { stars: null, reasons: [] };
+  const mx = Math.max(...per.map((p) => p.lv));
+  let stars = 1 + mx;
+  // 高いリスク（調整後レベル3以上）が2項目以上重なるときは1段階上げる
+  if (per.filter((p) => p.lv >= 3).length >= 2) stars = Math.min(5, stars + 1);
+  const reasons = per.filter((p) => p.lv >= 2).sort((a, b) => b.lv - a.lv).map((p) => `${p.c.name.replace(/（.*）/, '')}（${p.why.text}）`);
+  return { stars, reasons };
+}
+const starsHtml = (n) => n == null ? '<span class="stars">―</span>' : `<span class="stars" aria-label="危険度${n}">${'★'.repeat(n)}<i>${'☆'.repeat(5 - n)}</i></span>`;
+
 function worstText(c) {
   const w = c.items.filter((i) => !i.regional && i.level === c.levelOverall && i.level > 0)[0] || c.items.filter((i) => i.level === c.level && i.level > 0)[0];
   return w ? w.text : '';
@@ -235,17 +277,21 @@ async function renderResult(res, pdfs) {
   const { loc, floor, cats, overall, memo } = res;
   const out = $('#result');
   const list = Object.values(cats);
-  const high = list.filter((c) => c.levelOverall >= 3 && c.key !== 'hinan');
-  const gmap = `https://www.google.com/maps/search/?api=1&query=${loc.lat},${loc.lon}`;
-  const lvBig = overall == null ? '不明' : LEVELS[overall].label;
-  let html = `<div class="card summary b-${lvClass(overall)}">
+    const gmap = `https://www.google.com/maps/search/?api=1&query=${loc.lat},${loc.lon}`;
+  const reasons = res.reasons || [];
+  let html = `<div class="card summary s${overall ?? 'n'}">
     <div class="sum-head">
-      <div class="score"><div><small>総合</small><b>${lvLabel(overall)}</b></div></div>
+      <div class="risk">
+        <small>危険度</small>
+        ${starsHtml(overall)}
+        <b>${overall == null ? '判定できません' : STAR_LABEL[overall]}</b>
+      </div>
       <div class="sum-title"><b>${esc(loc.title || loc.query || '指定地点')}</b><span>${memo ? esc(memo) + ' ・ ' : ''}${floor}階の部屋として判定</span></div>
     </div>
     <div class="sum-body">
     ${overall == null ? `<div class="callout warn">${icon('warn')}<span>データを取得できませんでした。通信状態を確認して、もう一度判定してください。</span></div>`
-      : high.length ? `<div class="callout warn">${icon('warn')}<span>要確認：${high.map((c) => esc(c.name) + '（' + esc(worstText(c)) + '）').join('、')}</span></div>` : `<div class="callout ok">${icon('check')}<span>大きなリスクは見つかりませんでした（総合：${lvBig}）</span></div>`}
+      : reasons.length ? `<div class="callout ${overall >= 4 ? 'danger' : 'warn'}">${icon('warn')}<span>主な理由：${reasons.slice(0, 4).map(esc).join('、')}</span></div>` : `<div class="callout ok">${icon('check')}<span>大きなリスクは見つかりませんでした。</span></div>`}
+    <p class="note">危険度は、計画規模の浸水想定・過去の浸水実績・土砂災害を重視し、1000年に1回程度の「想定最大規模」の浸水は1段階割り引いて評価しています。震度・液状化は広い範囲で同程度のため、大きくは加味していません。</p>
     ${overall != null && list.some((c) => c.level == null) ? '<p class="note">「不明」の項目は、データが取れなかったか未整備です。下の詳細を確認してください。</p>' : ''}
     <div class="catgrid">${list.map((c) => `<a href="#cat-${c.key}" class="catchip ${lvClass(c.level)}">${icon(c.key)}<span>${esc(c.name.replace(/（.*）/, ''))}</span><b>${lvLabel(c.level)}</b></a>`).join('')}</div>
     <div class="btns"><button type="button" id="openMap" class="ghost sm">${icon('map')}地図で見る</button><a class="filebtn ghost sm" href="${gmap}" target="_blank" rel="noopener">${icon('external')}Googleマップ</a></div>
@@ -287,7 +333,7 @@ async function saveHistory(res) {
   for (const [k, c] of Object.entries(res.cats)) cats[k] = { name: c.name, level: c.level, text: worstText(c) };
   await db.put('history', {
     id: uid(), date: Date.now(), title: res.loc.title || res.loc.query || '指定地点', query: res.loc.query || '',
-    lat: res.loc.lat, lon: res.loc.lon, floor: res.floor, memo: res.memo, overall: res.overall, cats,
+    lat: res.loc.lat, lon: res.loc.lon, floor: res.floor, memo: res.memo, overall: res.overall, v: 2, cats,
   });
 }
 
@@ -297,7 +343,7 @@ async function renderHistory() {
   const el = $('#historyList');
   if (!list.length) { el.innerHTML = `<div class="card empty">${icon('history')}<div>まだ判定履歴はありません。<br>物件をチェックすると、ここに保存されます。</div></div>`; return; }
   el.innerHTML = list.map((h) => `<div class="card">
-    <div class="hist-head"><b>${esc(h.title)}</b>${badge(h.overall)}</div>
+    <div class="hist-head"><b>${esc(h.title)}</b>${h.v === 2 ? `<span class="hstars s${h.overall ?? 'n'}">${starsHtml(h.overall)}</span>` : badge(h.overall)}</div>
     <div class="muted">${new Date(h.date).toLocaleString('ja-JP')} / ${h.floor}階${h.memo ? ' / ' + esc(h.memo) : ''}</div>
     <div class="catgrid">${Object.values(h.cats).map((c) => `<span class="catchip ${lvClass(c.level)}"><span>${esc(c.name.replace(/（.*）/, ''))}</span><b>${lvLabel(c.level)}</b></span>`).join('')}</div>
     <div class="btns"><button class="ghost sm" data-re="${h.id}">${icon('redo')}もう一度判定</button><button class="ghost sm" data-del="${h.id}">${icon('trash')}削除</button></div>
