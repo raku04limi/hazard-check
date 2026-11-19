@@ -2,7 +2,7 @@ import { CATEGORIES, LEVELS, NATIONAL_LAYERS, evaluateNational, geocode } from '
 import { db, uid } from './db.js';
 import { icon, HERO } from './icons.js';
 import { MAP_CATEGORIES, isVisualOnly, loadIndex, framesAt, evalFrame, snippet, parseDepth, rgbHex } from './remotemaps.js';
-const VERSION = '2.9.0';
+const VERSION = '2.9.1';
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -260,7 +260,10 @@ function riskScore(cats) {
   }
   if (!any) return { stars: null, reasons: [] };
   const mx = Math.max(...per.map((p) => p.lv));
-  let stars = 1 + mx;
+  // ★1：目立つリスクなし（調整後レベル1以下）／★2：液状化・地形など広域の「注意」だけ
+  // ★3：浸水・土砂などで「注意」／★4：「高」／★5：「危険」、または「高」が2項目以上
+  const soft = (p) => ['jishin', 'chikei'].includes(p.c.key) || /液状化/.test(p.why.name + p.why.text);
+  let stars = mx <= 1 ? 1 : mx === 2 ? (per.some((p) => p.lv === 2 && !soft(p)) ? 3 : 2) : mx + 1;
   // 高いリスク（調整後レベル3以上）が2項目以上重なるときは1段階上げる
   if (per.filter((p) => p.lv >= 3).length >= 2) stars = Math.min(5, stars + 1);
   const reasons = per.filter((p) => p.lv >= 2).sort((a, b) => b.lv - a.lv).map((p) => `${p.c.name.replace(/（.*）/, '')}（${p.why.text}）`);
